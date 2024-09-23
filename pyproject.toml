@@ -1,0 +1,15 @@
+[project]
+name = "hangman"
+version = "0.1.0"
+description = "The first project from Sergey Zhukov's roadmap"
+authors = [
+    {name = "Ilia Korepanov"},
+]
+dependencies = []
+requires-python = "==3.11.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
