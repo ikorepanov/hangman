@@ -87,94 +87,15 @@ def build_hangman(mistakes):
         """
     
 
-class Hangman:
-    def __init__(self):
-        print(
-            """
-                 ____
-                |    |
-                     |
-                     |
-                     |
-            _________|_____
-            """
-        )
-    
-    def add_head(self):
-        print(
-            """
-                 ____
-                |    |
-                O    |
-                     |
-                     |
-            _________|_____
-            """
-        )
-
-    def add_body(self):
-        print(
-            """
-                 ____
-                |    |
-                O    |
-                |    |
-                     |
-            _________|_____
-            """
-        )
-
-    def add_right_hand(self):
-        print(
-            """
-                 ____
-                |    |
-              __O    |
-                |    |
-                     |
-            _________|_____
-            """
-        )
-
-    def add_left_hand(self):
-        print(
-            """
-                 ____
-                |    |
-              __O__  |
-                |    |
-                     |
-            _________|_____
-            """
-        )
-
-    def add_right_leg(self):
-        print(
-            """
-                 ____
-                |    |
-              __O__  |
-                |    |
-               /     |
-            _________|_____
-            """
-        )
-
-    def add_left_leg(self):
-        print(
-            """
-                 ____
-                |    |
-              __O__  |
-                |    |
-               / \   |
-            _________|_____
-            """
-        )
-
-
 def is_cyrillic(char):
     return bool(re.fullmatch('[ёа-я]', char))
+
+
+def first_time(letters, letter):
+    if letter not in letters:
+        return True
+    else:
+        return False
 
 
 def main():
@@ -187,19 +108,33 @@ def main():
     mistakes = 0
     print(build_hangman(mistakes))
 
+    used_letters = []
+
     while '*' in mask and mistakes < 6:
         print(f'Количество ошибок: {mistakes}\n')
         
         while True:
-            letter = input('Введи букву:\n')
-            if is_cyrillic(letter):
-                break
-            else:
+            letter = input(
+                'Введи букву: '
+            )
+            if letter == 'Стоп':
+                print('\nВы решили закончить игру. Всего доброго!\n')
+                exit()
+            elif not is_cyrillic(letter):
                 print(
                     f'\nНеобходимо использовать - только - буквы '
                     f'русского алфавита в нижнем регистре: а - я\n'
                 )
                 continue
+            elif not first_time(used_letters, letter):
+                print(
+                    f'\nВы уже вводили, в том числе, эту букву: '
+                    f'{", ".join(used_letters)}\n'
+                )
+                continue
+            else:
+                used_letters.append(letter)
+                break
 
         if letter in word:
             indices = find_occurrences(word, letter)
@@ -209,7 +144,7 @@ def main():
 
         print(' '.join(mask))
         print(build_hangman(mistakes))
-    
+      
     if mask == word:
         print('\nCongrats!\n')
     else:
