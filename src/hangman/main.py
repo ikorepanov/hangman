@@ -1,5 +1,5 @@
 from random import randrange
-import sys
+import re 
 
 def get_random_word(fhand, default=None):
     word = default
@@ -173,6 +173,10 @@ class Hangman:
         )
 
 
+def is_cyrillic(char):
+    return bool(re.fullmatch('[ёа-я]', char))
+
+
 def main():
     with open('dictionary.txt') as f:
         word = get_random_word(f)
@@ -185,8 +189,18 @@ def main():
 
     while '*' in mask and mistakes < 6:
         print(f'Количество ошибок: {mistakes}\n')
+        
+        while True:
+            letter = input('Введи букву:\n')
+            if is_cyrillic(letter):
+                break
+            else:
+                print(
+                    f'\nНеобходимо использовать - только - буквы '
+                    f'русского алфавита в нижнем регистре: а - я\n'
+                )
+                continue
 
-        letter = input('Введи букву:\n')
         if letter in word:
             indices = find_occurrences(word, letter)
             mask = open_mask(mask, letter, indices)
@@ -212,4 +226,4 @@ while True:
         main()
     else: 
         print('Пока!')
-        sys.exit()
+        exit()
