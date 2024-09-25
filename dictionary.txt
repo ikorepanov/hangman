@@ -1,5 +1,6 @@
-father
-mother
-dother
-son
-mama
+папа
+мама
+сын
+дочь
+бабушка
+дедушка
