@@ -1,5 +1,7 @@
 from random import randrange
-import re 
+import re
+from pathlib import Path
+
 
 def get_random_word(fhand, default=None):
     word = default
@@ -99,7 +101,9 @@ def first_time(letters, letter):
 
 
 def main():
-    with open('dictionary.txt') as f:
+    CWD = Path(__file__).parents[2]
+    path = CWD / 'data/dictionary.txt'
+    with path.open() as f:
         word = get_random_word(f)
     
     mask = '*' * len(word)
