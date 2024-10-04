@@ -100,69 +100,108 @@ def first_time(letters, letter):
         return False
 
 
-def main():
-    CWD = Path(__file__).parents[2]
-    path = CWD / 'data/dictionary.txt'
-    with path.open() as f:
-        word = get_random_word(f)
-    
-    mask = '*' * len(word)
-    print(' '.join(mask))
-    
-    mistakes = 0
-    print(build_hangman(mistakes))
-
-    used_letters = []
-
-    while '*' in mask and mistakes < 6:
-        print(f'Количество ошибок: {mistakes}\n')
-        
-        while True:
-            letter = input(
-                'Введи букву: '
-            )
-            if letter == 'Стоп':
-                print('\nВы решили закончить игру. Всего доброго!\n')
-                exit()
-            elif not is_cyrillic(letter):
-                print(
-                    f'\nНеобходимо использовать - только - буквы '
-                    f'русского алфавита в нижнем регистре: а - я\n'
-                )
-                continue
-            elif not first_time(used_letters, letter):
-                print(
-                    f'\nВы уже вводили, в том числе, эту букву: '
-                    f'{", ".join(used_letters)}\n'
-                )
-                continue
-            else:
-                used_letters.append(letter)
-                break
-
-        if letter in word:
-            indices = find_occurrences(word, letter)
-            mask = open_mask(mask, letter, indices)
-        else:
-            mistakes += 1
-
-        print(' '.join(mask))
-        print(build_hangman(mistakes))
-      
-    if mask == word:
-        print('\nCongrats!\n')
-    else:
-        print(f'Количество ошибок: {mistakes}')
-        print('\nYou have just lost!\n')
+def print_welcome_message():
+    print(
+            ' __________________________________________________________________\n'
+            '|                                                                  |\n'
+            '|                                                                  |\n'
+            '|                  Вас приветствует игра "Виселица!                |\n'
+            '|                                                                  |\n'
+            '|__________________________________________________________________|\n'
+        )
 
 
-while True:
-    decision = input(
+def ask_for_user_descision():
+    return input(
         'Начать новую игру или выйти из приложения? Введите "Y" или "N":\n'
     )
+
+
+def show_current_state(mask, mistakes):
+    print(
+        ' '.join(mask),
+        '\n\n'
+        f'Количество ошибок: {mistakes}\n'
+        f'{build_hangman(mistakes)}'
+    )
+
+print_welcome_message()
+game_count = 0
+
+while True:
+    decision = ask_for_user_descision()
+
     if decision == 'Y':
-        print(f'Вы ввели "{decision}". Начинаем!\nОтгадайте следующее слово\n')
-        main()
-    else: 
-        print('Пока!')
+
+        if game_count == 0:
+            print('\033[F' * 3, end='')
+            print('\033[J', end='')
+        else:
+            print('\033[F' * 17, end='')
+            print('\033[J', end='')
+
+        CWD = Path(__file__).parents[2]
+        path = CWD / 'data/dictionary.txt'
+        with path.open() as f:
+            word = get_random_word(f)
+        
+        mask = '*' * len(word)
+
+        print('\nОтгадайте следующее слово:')
+        
+        mistakes = 0
+        used_letters = []
+        
+        while '*' in mask and mistakes < 6:
+            show_current_state(mask, mistakes)
+            
+            while True:
+                letter = input('Введи букву: ')
+
+                if letter == 'Стоп':
+                    print('\033[K', end='')
+                    print('\nВы решили закончить игру. Всего доброго!\n')
+                    exit()
+
+                elif not is_cyrillic(letter):
+                    print(
+                        f'\nНеобходимо использовать - только - буквы '
+                        f'русского алфавита в нижнем регистре: а - я\n'
+                    )
+                    print('\033[F\033[F\033[F\033[F\033[K', end='')
+                    continue
+
+                elif not first_time(used_letters, letter):
+                    print(
+                        f'\nВы уже вводили, в том числе, эту букву: '
+                        f'{", ".join(used_letters)}\n'
+                    )
+                    print('\033[F\033[F\033[F\033[F\033[K', end='')
+                    continue
+
+                else:
+                    used_letters.append(letter)
+                    print('\033[F' * 12, end='')
+                    print('\033[J', end='')
+                    break
+        
+            if letter in word:
+                indices = find_occurrences(word, letter)
+                mask = open_mask(mask, letter, indices)
+            else:
+                mistakes += 1
+
+        show_current_state(mask, mistakes) 
+
+        if mask == word:
+            print('Congrats!\n')
+        else:
+            print('You have just lost!\n')
+    
+        game_count += 1
+
+    else:
+        print('\033[F' * 2, end='')
+        print('\033[J', end='')
+        print('Пока!\n')
         exit()
