@@ -134,11 +134,9 @@ while True:
     if decision == 'Y':
 
         if game_count == 0:
-            print('\033[F' * 3, end='')
-            print('\033[J', end='')
+            print('\033[2F\033[J', end='')
         else:
-            print('\033[F' * 17, end='')
-            print('\033[J', end='')
+            print('\033[16F\033[J', end='')
 
         CWD = Path(__file__).parents[2]
         path = CWD / 'data/dictionary.txt'
@@ -147,7 +145,7 @@ while True:
         
         mask = '*' * len(word)
 
-        print('\nОтгадайте следующее слово:')
+        print('Отгадайте следующее слово:')
         
         mistakes = 0
         used_letters = []
@@ -156,33 +154,33 @@ while True:
             show_current_state(mask, mistakes)
             
             while True:
-                letter = input('Введи букву: ')
+                letter = input('Введите букву: ')
 
                 if letter == 'Стоп':
-                    print('\033[K', end='')
                     print('\nВы решили закончить игру. Всего доброго!\n')
                     exit()
 
                 elif not is_cyrillic(letter):
                     print(
-                        f'\nНеобходимо использовать - только - буквы '
-                        f'русского алфавита в нижнем регистре: а - я\n'
+                        '\nНеобходимо использовать - только - буквы',
+                        'русского алфавита в нижнем регистре: а - я',
+                        '\033[2F\033[K',
+                        end='',
                     )
-                    print('\033[F\033[F\033[F\033[F\033[K', end='')
                     continue
 
                 elif not first_time(used_letters, letter):
                     print(
-                        f'\nВы уже вводили, в том числе, эту букву: '
-                        f'{", ".join(used_letters)}\n'
+                        '\nВы уже вводили, в том числе, эту букву:',
+                        f'{", ".join(used_letters)}',
+                        '\033[2F\033[K',
+                        end='',
                     )
-                    print('\033[F\033[F\033[F\033[F\033[K', end='')
                     continue
 
                 else:
                     used_letters.append(letter)
-                    print('\033[F' * 12, end='')
-                    print('\033[J', end='')
+                    print('\033[12F\033[J', end='')
                     break
         
             if letter in word:
@@ -201,7 +199,5 @@ while True:
         game_count += 1
 
     else:
-        print('\033[F' * 2, end='')
-        print('\033[J', end='')
-        print('Пока!\n')
+        print('\033[2F\033[JПока!\n')
         exit()
