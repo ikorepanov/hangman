@@ -5,7 +5,12 @@ description = "The first project from Sergey Zhukov's roadmap"
 authors = [
     {name = "Ilia Korepanov"},
 ]
-dependencies = []
+dependencies = [
+    "isort==5.13.2",
+    "flake8==7.1.1",
+    "mypy==1.11.2",
+    "black==24.10.0",
+]
 requires-python = "==3.11.*"
 readme = "README.md"
 license = {text = "MIT"}
@@ -13,3 +18,23 @@ license = {text = "MIT"}
 
 [tool.pdm]
 distribution = false
+
+[tool.isort]
+line_length = 120
+force_alphabetical_sort_within_sections = true
+include_trailing_comma = true
+use_parentheses = true
+multi_line_output = 3
+force_grid_wrap = 2
+
+[tool.mypy]
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+ignore_missing_imports = true
+
+# for strict mypy: (this is the tricky one :-))
+disallow_untyped_defs = true

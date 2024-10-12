@@ -1,6 +1,8 @@
-from random import randrange
 import re
+from random import randrange
+
 from paths import DICT_PATH
+
 
 def get_random_word(fhand, default=None):
     word = default
@@ -83,10 +85,10 @@ def build_hangman(mistakes):
             |    |
           __O__  |
             |    |
-           / \   |
+           / \\   |
         _________|_____
         """
-    
+
 
 def is_cyrillic(char):
     return bool(re.fullmatch('[ёа-я]', char))
@@ -99,14 +101,14 @@ def first_time(letters, letter):
         return False
 
 
-def print_welcome_message():
+def print_welcome_message() -> None:
     print(
-            ' __________________________________________________________________\n'
-            '|                                                                  |\n'
-            '|                                                                  |\n'
-            '|                  Вас приветствует игра "Виселица!                |\n'
-            '|                                                                  |\n'
-            '|__________________________________________________________________|\n'
+            ' _____________________________________________________________\n'
+            '|                                                             |\n'
+            '|                                                             |\n'
+            '|              Вас приветствует игра "Виселица!               |\n'
+            '|                                                             |\n'
+            '|_____________________________________________________________|\n'
         )
 
 
@@ -121,7 +123,7 @@ def show_current_state(mask, mistakes):
 
 def enter_letter(mask, mistakes, used_letters):
     show_current_state(mask, mistakes)
-            
+
     while True:
         letter = input('Введите букву: ')
         # if letter == 'Стоп':
@@ -158,43 +160,43 @@ def prepare_screen(game_count):
 
 def run_game(game_count):
     prepare_screen(game_count)
-    
+
     with DICT_PATH.open() as f:
         word = get_random_word(f)
-    
+
     mask = '*' * len(word)
     mistakes = 0
     used_letters = []
 
     print('Отгадайте следующее слово:')
-    
+
     while '*' in mask and mistakes < 6:
         letter = enter_letter(mask, mistakes, used_letters)
-    
+
         if letter in word:
             indices = find_occurrences(word, letter)
             mask = open_mask(mask, letter, indices)
         else:
             mistakes += 1
 
-    show_current_state(mask, mistakes) 
-    
+    show_current_state(mask, mistakes)
+
     if mask == word:
         print('Поздравляем! Вы выиграли!\n')
     else:
         print('К сожалению, вы проиграли!\n')
 
 
-def main():
+def main() -> None:
     print_welcome_message()
     game_count = 0
-    
+
     while True:
         decision = input(
             'Начать новую игру (1) или выйти из приложения(2)? '
             'Введите 1 или 2:\n'
         )
-    
+
         if decision == '1':
             run_game(game_count)
             game_count += 1
