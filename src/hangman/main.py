@@ -1,30 +1,37 @@
 import re
+from io import TextIOWrapper
 from random import randrange
 
 from paths import DICT_PATH
 
 
-def get_random_word(fhand, default=None):
+def get_random_word(
+        fhand: TextIOWrapper,
+        default: str | None,
+) -> str:
     word = default
     for i, aline in enumerate(fhand, start=1):
         if randrange(i) == 0:
             word = aline
-    return word.strip()
+    if word is not None:
+        return word.strip()
+    else:
+        return ''
 
 
-def find_occurrences(s, ch):
-    return [i for i, letter in enumerate(s) if letter == ch]
-
-
-def open_mask(mask, letter, indices):
-    letters = list(mask)
+def open_mask(
+        mask: str,
+        word: str,
+        letter: str,
+) -> str:
+    mask_asterisks = list(mask)
+    indices = [i for i, char in enumerate(word) if char == letter]
     for index in indices:
-        letters[index] = letter
-    mask = ''.join(letters)
-    return mask
+        mask_asterisks[index] = letter
+    return ''.join(mask_asterisks)
 
 
-def build_hangman(mistakes):
+def build_hangman(mistakes: int) -> str:
     if mistakes == 0:
         return """
              ____
@@ -88,13 +95,18 @@ def build_hangman(mistakes):
            / \\   |
         _________|_____
         """
+    else:
+        return ''
 
 
-def is_cyrillic(char):
+def is_cyrillic(char: str) -> bool:
     return bool(re.fullmatch('[ёа-я]', char))
 
 
-def first_time(letters, letter):
+def first_time(
+        letters: list[str],
+        letter: str,
+) -> bool:
     if letter not in letters:
         return True
     else:
@@ -112,7 +124,10 @@ def print_welcome_message() -> None:
         )
 
 
-def show_current_state(mask, mistakes):
+def show_current_state(
+        mask: str,
+        mistakes: int,
+) -> None:
     print(
         ' '.join(mask),
         '\n\n'
@@ -121,14 +136,15 @@ def show_current_state(mask, mistakes):
     )
 
 
-def enter_letter(mask, mistakes, used_letters):
+def enter_letter(
+        mask: str,
+        mistakes: int,
+        used_letters: list[str],
+) -> str:
     show_current_state(mask, mistakes)
 
     while True:
         letter = input('Введите букву: ')
-        # if letter == 'Стоп':
-        #     print('\nВы решили закончить игру. Всего доброго!\n')
-        #     exit(
         if not is_cyrillic(letter):
             print(
                 '\nНеобходимо использовать - только - буквы',
@@ -151,22 +167,22 @@ def enter_letter(mask, mistakes, used_letters):
             return letter
 
 
-def prepare_screen(game_count):
+def prepare_screen(game_count: int) -> None:
     if game_count == 0:
         print('\033[2F\033[J', end='')
     else:
         print('\033[16F\033[J', end='')
 
 
-def run_game(game_count):
+def run_game(game_count: int) -> None:
     prepare_screen(game_count)
 
     with DICT_PATH.open() as f:
-        word = get_random_word(f)
+        word = get_random_word(f, default=None)
 
     mask = '*' * len(word)
     mistakes = 0
-    used_letters = []
+    used_letters: list[str] = []
 
     print('Отгадайте следующее слово:')
 
@@ -174,8 +190,7 @@ def run_game(game_count):
         letter = enter_letter(mask, mistakes, used_letters)
 
         if letter in word:
-            indices = find_occurrences(word, letter)
-            mask = open_mask(mask, letter, indices)
+            mask = open_mask(mask, word, letter)
         else:
             mistakes += 1
 
