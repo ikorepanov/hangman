@@ -19,6 +19,10 @@ license = {text = "MIT"}
 [tool.pdm]
 distribution = false
 
+[tool.pdm.dev-dependencies]
+lint = [
+    "wemake-python-styleguide==0.18.0",
+]
 [tool.isort]
 line_length = 120
 force_alphabetical_sort_within_sections = true
@@ -36,5 +40,5 @@ check_untyped_defs = true
 no_implicit_reexport = true
 ignore_missing_imports = true
 
-# for strict mypy: (this is the tricky one :-))
+# for strict mypy:
 disallow_untyped_defs = true
