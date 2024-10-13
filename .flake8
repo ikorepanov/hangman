@@ -26,4 +26,3 @@ per-file-ignores =
     # the use of input(), print() is justified by the logic of the application
     # need backslash as a left hand for hangman
     src/hangman/main.py: WPS421, W605
-    src/hangman/tools.py: WPS421
