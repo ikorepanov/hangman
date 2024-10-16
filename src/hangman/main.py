@@ -1,6 +1,4 @@
 """
-Первая строка.
-
 Этот модуль является основным скриптом приложения и отвечает за запуск
 главной логики программы.
 """
@@ -64,7 +62,7 @@ L_HAND = """
 R_LEG = """
          ____
         |    |
-      __O    |
+      __O__  |
         |    |
        /     |
     _________|_____
@@ -77,16 +75,6 @@ L_LEG = """
        / \   |
     _________|_____
 """
-
-options = {
-    '0': EMPTY,
-    '1': HEAD,
-    '2': BODY,
-    '3': R_HAND,
-    '4': L_HAND,
-    '5': R_LEG,
-    '6': L_LEG,
-}
 
 
 def get_random_word(default: str | None) -> str:
@@ -133,17 +121,18 @@ def open_mask(
 
 
 def build_hangman(mistakes: int) -> str:
-    """_summary_.
+    stages = [
+        EMPTY,
+        HEAD,
+        BODY,
+        R_HAND,
+        L_HAND,
+        R_LEG,
+        L_LEG,
+    ]
 
-    :param mistakes: _description_
-    :type mistakes: int
-    :return: _description_
-    :rtype: str
-    """
-
-    action = options.get(str(mistakes))
-    if action:
-        return action
+    if 0 <= mistakes <= len(stages):
+        return stages[mistakes]
     return ''
 
 
