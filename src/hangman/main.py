@@ -1,8 +1,3 @@
-"""
-Этот модуль является основным скриптом приложения и отвечает за запуск
-главной логики программы.
-"""
-
 import re
 from pathlib import Path
 from random import randrange
@@ -78,14 +73,6 @@ L_LEG = """
 
 
 def get_random_word(default: str | None) -> str:
-    """_summary_.
-
-    :param default: _description_
-    :type default: str | None
-    :return: _description_
-    :rtype: str
-    """
-
     with DICT_PATH.open() as fhand:
         word = default
         for index, aline in enumerate(fhand, start=1):
@@ -101,18 +88,6 @@ def open_mask(
     word: str,
     letter: str,
 ) -> str:
-    """_summary_.
-
-    :param mask: _description_
-    :type mask: str
-    :param word: _description_
-    :type word: str
-    :param letter: _description_
-    :type letter: str
-    :return: _description_
-    :rtype: str
-    """
-
     mask_asterisks = list(mask)
     indices = [index for index, char in enumerate(word) if char == letter]
     for index in indices:
@@ -140,14 +115,6 @@ def show_current_state(
     mask: str,
     mistakes: int,
 ) -> None:
-    """_summary_.
-
-    :param mask: _description_
-    :type mask: str
-    :param mistakes: _description_
-    :type mistakes: int
-    """
-
     print(
         ' '.join(mask),
         f'\n\nКоличество ошибок: {mistakes}\n',
@@ -155,48 +122,38 @@ def show_current_state(
     )
 
 
+def print_not_cyrillic() -> None:
+    print(
+        '\n\033[KНеобходимо использовать буквы',
+        'русского алфавита: а - я (А - Я)',
+        '\033[2F\033[K',
+        end='',
+    )
+
+
 def not_cyrillic(letter: str) -> bool:
-    """_summary_.
-
-    :param letter: _description_
-    :type letter: str
-    :return: _description_
-    :rtype: bool
-    """
-
     if bool(not re.fullmatch('[ёа-я]', letter)):
-        print(
-            '\n\033[KНеобходимо использовать буквы',
-            'русского алфавита: а - я (А - Я)',
-            '\033[2F\033[K',
-            end='',
-        )
+        print_not_cyrillic()
         return True
     return False
+
+
+def print_already_used(used_letters: list[str]) -> None:
+    list_used_letters = ', '.join(used_letters)
+    print(
+        '\n\033[KВы уже вводили, в том числе, эту букву:',
+        f'{list_used_letters}',
+        '\033[2F\033[K',
+        end='',
+    )
 
 
 def already_used(
     used_letters: list[str],
     letter: str,
 ) -> bool:
-    """_summary_.
-
-    :param used_letters: _description_
-    :type used_letters: list[str]
-    :param letter: _description_
-    :type letter: str
-    :return: _description_
-    :rtype: bool
-    """
-
     if letter in used_letters:
-        list_used_letters = ', '.join(used_letters)
-        print(
-            '\n\033[KВы уже вводили, в том числе, эту букву:',
-            f'{list_used_letters}',
-            '\033[2F\033[K',
-            end='',
-        )
+        print_already_used(used_letters)
         return True
     return False
 
@@ -205,88 +162,72 @@ def not_valid_symbol(
     used_letters: list[str],
     letter: str,
 ) -> bool:
-    """_summary_.
-
-    :param used_letters: _description_
-    :type used_letters: list[str]
-    :param letter: _description_
-    :type letter: str
-    :return: _description_
-    :rtype: bool
-    """
-
     return not_cyrillic(letter) or already_used(used_letters, letter)
 
 
-def enter_letter(
-    mask: str,
-    mistakes: int,
-    used_letters: list[str],
-) -> str:
-    """_summary_.
-
-    :param mask: _description_
-    :type mask: str
-    :param mistakes: _description_
-    :type mistakes: int
-    :param used_letters: _description_
-    :type used_letters: list[str]
-    :return: _description_
-    :rtype: str
-    """
-    show_current_state(mask, mistakes)
-
+def enter_letter(used_letters: list[str]) -> str:
     while True:
         letter = input('Введите букву: ').lower()
-
         if not_valid_symbol(used_letters, letter):
             continue
-
         used_letters.append(letter)
-        print('\033[12F\033[J', end='')
-
         return letter
 
 
-def run_game(game_count: int) -> None:
-    """_summary_.
-
-    :param game_count: _description_
-    :type game_count: int
-    """
-
+def prepare_screen(game_count: int) -> None:
     if game_count == 0:
         print('\033[2F\033[J', end='')
     else:
         print('\033[16F\033[J', end='')
 
-    word = get_random_word(default=None)
 
-    mask = '*' * len(word)
-    mistakes = 0
-    used_letters: list[str] = []
-
-    print('Отгадайте следующее слово:')
-
-    while '*' in mask and mistakes < 6:
-        letter = enter_letter(mask, mistakes, used_letters)
-
-        if letter in word:
-            mask = open_mask(mask, word, letter)
-        else:
-            mistakes += 1
-
-    show_current_state(mask, mistakes)
-
+def print_final_message(
+    mask: str,
+    word: str,
+) -> None:
     if mask == word:
         print('Поздравляем! Вы выиграли!\n')
     else:
         print('К сожалению, вы проиграли!\n')
 
 
-def main() -> None:
-    """_summary_."""
+def process_letter(
+    letter: str,
+    word: str,
+    mask: str,
+    mistakes: int,
+) -> tuple[str, int]:
+    if letter in word:
+        mask = open_mask(mask, word, letter)
+    else:
+        mistakes += 1
+    print('\033[12F\033[J', end='')
+    return mask, mistakes
 
+
+def init_start_params() -> tuple[str, str, int, list[str]]:
+    word = get_random_word(default=None)
+    mask = '*' * len(word)
+    mistakes = 0
+    used_letters: list[str] = []
+    print('Отгадайте следующее слово:')
+    return word, mask, mistakes, used_letters
+
+
+def run_game(game_count: int) -> None:
+    prepare_screen(game_count)
+    word, mask, mistakes, used_letters = init_start_params()
+
+    while '*' in mask and mistakes < 6:
+        show_current_state(mask, mistakes)
+        letter = enter_letter(used_letters)
+        mask, mistakes = process_letter(letter, word, mask, mistakes)
+
+    show_current_state(mask, mistakes)
+    print_final_message(mask, word)
+
+
+def main() -> None:
     print(WELCOME_MESSAGE)
     game_count = 0
 
