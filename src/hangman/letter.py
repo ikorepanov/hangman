@@ -44,7 +44,6 @@ def is_not_cyrillic(letter: str) -> bool:
 
     :param letter: Проверяемый символ
     :type letter: str
-
     :return: Возвращает True, если символ не кириллический, иначе False
     :rtype: bool
     """
@@ -63,7 +62,6 @@ def print_already_used(used_letters: list[str]) -> None:
 
     :param used_letters: Список букв, которые пользователь уже вводил
     :type used_letters: list[str]
-
     :return: None
     :rtype: None
     """
@@ -90,7 +88,6 @@ def is_already_used(
     :type used_letters: list[str]
     :param letter: Проверяемая буква
     :type letter: str
-
     :return: Возвращает True, если буква уже была введена, иначе False
     :rtype: bool
     """
