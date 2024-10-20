@@ -1,7 +1,28 @@
-import re
-from random import randrange
+"""
+Модуль для запуска игры "Виселица".
 
-from paths import DICT_PATH
+Этот модуль управляет циклом игры, отображает приветственное сообщение, 
+обрабатывает ввод пользователя для начала новой игры или выхода, 
+и определяет, выиграл ли игрок.
+
+Константы:
+-----------
+- WELCOME_MESSAGE: Приветственное сообщение, выводимое при запуске игры.
+
+Функции:
+---------
+- print_final_message: Выводит финальное сообщение о результате игры (победа или поражение).
+- run_game: Основной игровой цикл, который инициализирует параметры, управляет состоянием игры и обрабатывает ходы.
+- main: Основная функция, отображающая приветственное сообщение и предлагающая начать новую игру или выйти из приложения.
+"""
+
+from hangman.letter import enter_letter
+from hangman.tools import (
+    init_start_params,
+    prepare_screen,
+    process_letter,
+    show_current_state,
+)
 
 WELCOME_MESSAGE = """
  _____________________________________________________________
@@ -12,175 +33,23 @@ WELCOME_MESSAGE = """
 |_____________________________________________________________|
 """
 
-EMPTY = """
-         ____
-        |    |
-             |
-             |
-             |
-    _________|_____
-"""
-HEAD = """
-         ____
-        |    |
-        O    |
-             |
-             |
-    _________|_____
-"""
-BODY = """
-         ____
-        |    |
-        O    |
-        |    |
-             |
-    _________|_____
-"""
-R_HAND = """
-         ____
-        |    |
-      __O    |
-        |    |
-             |
-    _________|_____
-"""
-L_HAND = """
-         ____
-        |    |
-      __O__  |
-        |    |
-             |
-    _________|_____
-"""
-R_LEG = """
-         ____
-        |    |
-      __O    |
-        |    |
-       /     |
-    _________|_____
-"""
-L_LEG = """
-         ____
-        |    |
-      __O__  |
-        |    |
-       / \   |
-    _________|_____
-"""
 
-options = {
-    '0': EMPTY,
-    '1': HEAD,
-    '2': BODY,
-    '3': R_HAND,
-    '4': L_HAND,
-    '5': R_LEG,
-    '6': L_LEG,
-}
-
-
-def get_random_word(
-    default: str | None,
-) -> str:
-    with DICT_PATH.open() as fhand:
-        word = default
-        for index, aline in enumerate(fhand, start=1):
-            if randrange(index) == 0:
-                word = aline
-        if word is not None:
-            return word.strip()
-        return ''
-
-
-def open_mask(
+def print_final_message(
     mask: str,
     word: str,
-    letter: str,
-) -> str:
-    mask_asterisks = list(mask)
-    indices = [index for index, char in enumerate(word) if char == letter]
-    for index in indices:
-        mask_asterisks[index] = letter
-    return ''.join(mask_asterisks)
-
-
-def build_hangman(mistakes: int) -> str:
-    action = options.get(str(mistakes))
-    if action:
-        return action
-    return ''
-
-
-def show_current_state(
-    mask: str,
-    mistakes: int,
 ) -> None:
-    print(
-        ' '.join(mask),
-        f'\n\nКоличество ошибок: {mistakes}\n',
-        f'{build_hangman(mistakes)}',
-    )
+    """Выводит финальное сообщение о результате игры.
 
+    Если маска совпадает с загаданным словом, выводит сообщение о победе.
+    В противном случае выводит сообщение о поражении.
 
-def enter_letter(
-    mask: str,
-    mistakes: int,
-    used_letters: list[str],
-) -> str:
-    show_current_state(mask, mistakes)
-
-    while True:
-        letter = input('Введите букву: ')
-
-        if bool(not re.fullmatch('[ёа-я]', letter)):
-            print(
-                '\nНеобходимо использовать - только - буквы',
-                'русского алфавита в нижнем регистре: а - я',
-                '\033[2F\033[K',
-                end='',
-            )
-            continue
-
-        elif letter in used_letters:
-            list_used_letters = ', '.join(used_letters)
-            print(
-                '\nВы уже вводили, в том числе, эту букву:',
-                f'{list_used_letters}',
-                '\033[2F\033[K',
-                end='',
-            )
-            continue
-
-        used_letters.append(letter)
-        print('\033[12F\033[J', end='')
-
-        return letter
-
-
-def run_game(game_count: int) -> None:
-    if game_count == 0:
-        print('\033[2F\033[J', end='')
-    else:
-        print('\033[16F\033[J', end='')
-
-    word = get_random_word(default=None)
-
-    mask = '*' * len(word)
-    mistakes = 0
-    used_letters: list[str] = []
-
-    print('Отгадайте следующее слово:')
-
-    while '*' in mask and mistakes < 6:
-        letter = enter_letter(mask, mistakes, used_letters)
-
-        if letter in word:
-            mask = open_mask(mask, word, letter)
-        else:
-            mistakes += 1
-
-    show_current_state(mask, mistakes)
+    :param mask: Текущая маска слова (с угаданными буквами)
+    :type mask: str
+    :param word: Загаданное слово
+    :type word: str
+    :return: None
+    :rtype: None
+    """
 
     if mask == word:
         print('Поздравляем! Вы выиграли!\n')
@@ -188,7 +57,42 @@ def run_game(game_count: int) -> None:
         print('К сожалению, вы проиграли!\n')
 
 
+def run_game(game_count: int) -> None:
+    """Основной цикл игры "Виселица".
+
+    Инициализирует параметры игры (слово, маску, ошибки, использованные буквы),
+    управляет процессом угадывания букв и выводит текущее состояние игры.
+    Игра продолжается, пока игрок не отгадает слово или не наберет 6 ошибок.
+
+    :param game_count: Количество сыгранных игр для управления экраном
+    :type game_count: int
+    :return: None
+    :rtype: None
+    """
+
+    prepare_screen(game_count)
+    word, mask, mistakes, used_letters = init_start_params()
+
+    while '*' in mask and mistakes < 6:
+        show_current_state(mask, mistakes)
+        letter = enter_letter(used_letters)
+        mask, mistakes = process_letter(letter, word, mask, mistakes)
+
+    show_current_state(mask, mistakes)
+    print_final_message(mask, word)
+
+
 def main() -> None:
+    """Основная функция, запускающая приложение.
+
+    Выводит приветственное сообщение и предлагает пользователю выбрать:
+    начать новую игру или выйти из приложения. Запускает новую игру при выборе 1
+    или завершает приложение при выборе 2.
+
+    :return: None
+    :rtype: None
+    """
+
     print(WELCOME_MESSAGE)
     game_count = 0
 

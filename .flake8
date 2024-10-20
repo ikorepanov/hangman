@@ -14,7 +14,7 @@ ignore = S301, S311,
     WPS226,
     WPS237,
     WPS305, WPS306, WPS317,
-    WPS410, WPS412, WPS440,
+    WPS410, WPS412, WPS421, WPS440,
     WPS602, WPS605,
     D100, D101, D102, D103, D104, D105, D107, D202,
     DAR101,
@@ -23,6 +23,5 @@ ignore = S301, S311,
     RST202, RST203, RST206,
 
 per-file-ignores =
-    # the use of input(), print() is justified by the logic of the application
     # need backslash as a left hand for hangman
-    src/hangman/main.py: WPS421, W605
+    src/hangman/tools.py: W605
