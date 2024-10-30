@@ -8,6 +8,10 @@ https://zhukovsd.github.io/python-backend-learning-course/
 Клонируем репозиторий:
 ```shell
 git clone https://github.com/ikorepanov/hangman.git
+```
+
+Переходим в папку hangman:
+```shell
 cd hangman
 ```
 
