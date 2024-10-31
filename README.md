@@ -29,6 +29,11 @@ git clone https://github.com/ikorepanov/hangman.git
 cd hangman
 ```
 
+Устанавливаем пакет в editable-режиме с помощью команды:
+```shell
+pip install -e .
+```
+
 ## Использование
 
 Запускаем скрипт:
