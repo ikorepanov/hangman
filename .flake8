@@ -24,4 +24,4 @@ ignore = S301, S311,
 
 per-file-ignores =
     # need backslash as a left hand for hangman
-    src/hangman/tools.py: W605
+    hangman/tools.py: W605
