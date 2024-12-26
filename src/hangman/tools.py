@@ -19,9 +19,9 @@
 - open_mask: Открывает буквы в маске, если они угаданы.
 - process_letter: Обрабатывает введённую букву, обновляя маску или увеличивая количество ошибок.
 """
-
 from pathlib import Path
 from random import randrange
+from typing import Any
 
 CWD = Path(__file__).parents[2]
 DICT_PATH = CWD / 'data/dictionary.txt'
@@ -125,22 +125,20 @@ def get_random_word(default: str | None) -> str:
         return ''
 
 
-def init_start_params() -> tuple[str, str, int, list[str]]:
-    """Инициализирует стартовые параметры игры.
+def init_start_params() -> dict[str, Any]:
+    """Инициализирует стартовые параметры игры и возвращает их в виде словаря."""
 
-    Возвращает случайное слово, его маску (скрытые буквы), начальное количество
-    ошибок и пустой список использованных букв.
-
-    :return: Кортеж из слова, маски, количества ошибок и использованных букв
-    :rtype: tuple[str, str, int, list[str]]
-    """
-
+    start_params: dict[str, Any] = {}
     word = get_random_word(default=None)
-    mask = '*' * len(word)
-    mistakes = 0
-    used_letters: list[str] = []
+
+    start_params['word'] = word
+    start_params['mask'] = '*' * len(word)
+    start_params['mistakes'] = 0
+    start_params['used_letters'] = []
+
     print('Отгадайте следующее слово:')
-    return word, mask, mistakes, used_letters
+
+    return start_params
 
 
 def build_hangman(mistakes: int) -> str:
