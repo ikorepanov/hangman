@@ -19,70 +19,19 @@
 - open_mask: Открывает буквы в маске, если они угаданы.
 - process_letter: Обрабатывает введённую букву, обновляя маску или увеличивая количество ошибок.
 """
-from pathlib import Path
 from random import randrange
 from typing import Any
 
-CWD = Path(__file__).parents[2]
-DICT_PATH = CWD / 'data/dictionary.txt'
-
-
-EMPTY = """
-         ____
-        |    |
-             |
-             |
-             |
-    _________|_____
-"""
-HEAD = """
-         ____
-        |    |
-        O    |
-             |
-             |
-    _________|_____
-"""
-BODY = """
-         ____
-        |    |
-        O    |
-        |    |
-             |
-    _________|_____
-"""
-R_HAND = """
-         ____
-        |    |
-      __O    |
-        |    |
-             |
-    _________|_____
-"""
-L_HAND = """
-         ____
-        |    |
-      __O__  |
-        |    |
-             |
-    _________|_____
-"""
-R_LEG = """
-         ____
-        |    |
-      __O__  |
-        |    |
-       /     |
-    _________|_____
-"""
-L_LEG = """
-         ____
-        |    |
-      __O__  |
-        |    |
-       / \   |
-    _________|_____
-"""
+from hangman.params import (
+    BODY,
+    DICT_PATH,
+    EMPTY,
+    HEAD,
+    L_HAND,
+    L_LEG,
+    R_HAND,
+    R_LEG,
+)
 
 
 def prepare_screen(game_count: int) -> None:

@@ -18,21 +18,13 @@
 """
 
 from hangman.letter import enter_letter
+from hangman.params import WELCOME_MESSAGE
 from hangman.tools import (
     init_start_params,
     prepare_screen,
     process_letter,
     show_current_state,
 )
-
-WELCOME_MESSAGE = """
- _____________________________________________________________
-|                                                             |
-|                                                             |
-|              Вас приветствует игра "Виселица!               |
-|                                                             |
-|_____________________________________________________________|
-"""
 
 
 def print_final_message(
@@ -55,7 +47,7 @@ def print_final_message(
     if mask == word:
         print('Поздравляем! Вы выиграли!\n')
     else:
-        print('К сожалению, вы проиграли!\n')
+        print(f'К сожалению, вы проиграли! Было загадано слово "{word}"\n')
 
 
 def run_game(game_count: int) -> None:
