@@ -91,13 +91,7 @@ def init_start_params() -> dict[str, Any]:
 
 
 def build_hangman(mistakes: int) -> str:
-    """Возвращает текущее состояние виселицы в зависимости от количества ошибок.
-
-    :param mistakes: Количество сделанных ошибок
-    :type mistakes: int
-    :return: Сцена виселицы, соответствующая текущему количеству ошибок
-    :rtype: str
-    """
+    """Возвращает текущую сцену виселицы в зависимости от числа ошибок."""
 
     stages = [
         EMPTY,
@@ -109,7 +103,7 @@ def build_hangman(mistakes: int) -> str:
         L_LEG,
     ]
 
-    if 0 <= mistakes <= len(stages):
+    if 0 <= mistakes <= len(stages) - 1:
         return stages[mistakes]
     return ''
 
