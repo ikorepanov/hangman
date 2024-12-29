@@ -64,7 +64,7 @@ def get_random_word(default: str | None) -> str:
     :rtype: str
     """
 
-    with DICT_PATH.open() as fhand:
+    with DICT_PATH.open('r', encoding='UTF-8') as fhand:
         word = default
         for index, aline in enumerate(fhand, start=1):
             if randrange(index) == 0:
