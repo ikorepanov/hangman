@@ -81,7 +81,7 @@ def init_start_params() -> dict[str, Any]:
     word = get_random_word(default=None)
 
     start_params['word'] = word
-    start_params['mask'] = '*' * len(word)
+    start_params['mask'] = ['*'] * len(word)
     start_params['mistakes'] = 0
     start_params['used_letters'] = []
 
@@ -139,37 +139,24 @@ def show_current_state(
 
 
 def open_mask(
-    mask: str,
+    mask: list[str],
     word: str,
     letter: str,
-) -> str:
-    """Открывает угаданные буквы в маске.
+) -> list[str]:
+    """Открывает в маске все вхождения угаданной буквы."""
 
-    Функция обновляет маску, открывая все вхождения угаданной буквы.
-
-    :param mask: Текущая маска слова
-    :type mask: str
-    :param word: Загаданное слово
-    :type word: str
-    :param letter: Угаданная буква
-    :type letter: str
-    :return: Обновлённая маска с открытыми буквами
-    :rtype: str
-    """
-
-    mask_asterisks = list(mask)
-    indices = [index for index, char in enumerate(word) if char == letter]
-    for index in indices:
-        mask_asterisks[index] = letter
-    return ''.join(mask_asterisks)
+    for index, char in enumerate(word):
+        if char == letter:
+            mask[index] = letter
+    return mask
 
 
 def process_letter(
     letter: str,
     word: str,
-    mask: str,
+    mask: list[str],
     mistakes: int,
-) -> tuple[str, int]:
+) -> tuple[list[str], int]:
     """Обрабатывает введённую пользователем букву.
 
     Если буква угадана, обновляет маску, в противном случае увеличивает

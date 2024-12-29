@@ -28,23 +28,12 @@ from hangman.tools import (
 
 
 def print_final_message(
-    mask: str,
+    mask: list[str],
     word: str,
 ) -> None:
-    """Выводит финальное сообщение о результате игры.
+    """Выводит сообщение о победе или поражении в игре."""
 
-    Если маска совпадает с загаданным словом, выводит сообщение о победе.
-    В противном случае выводит сообщение о поражении.
-
-    :param mask: Текущая маска слова (с угаданными буквами)
-    :type mask: str
-    :param word: Загаданное слово
-    :type word: str
-    :return: None
-    :rtype: None
-    """
-
-    if mask == word:
+    if ''.join(mask) == word:
         print('Поздравляем! Вы выиграли!\n')
     else:
         print(f'К сожалению, вы проиграли! Было загадано слово "{word}"\n')
