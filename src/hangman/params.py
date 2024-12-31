@@ -68,3 +68,5 @@ L_LEG = """
        / \   |
     _________|_____
 """
+
+STAGES = [EMPTY, HEAD, BODY, R_HAND, L_HAND, R_LEG, L_LEG]

@@ -22,6 +22,7 @@ from pathlib import Path
 from hangman.letter import enter_letter
 from hangman.params import (
     DICT_PATH,
+    STAGES,
     WELCOME_MESSAGE,
 )
 from hangman.tools import (
@@ -44,7 +45,7 @@ def print_final_message(
         print(f'К сожалению, вы проиграли! Было загадано слово "{word}"\n')
 
 
-def run_game(game_count: int, dict_path: Path) -> None:
+def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
     """Основной цикл игры "Виселица".
 
     Инициализирует параметры игры, управляет процессом угадывания букв и выводит текущее состояние игры.
@@ -59,12 +60,12 @@ def run_game(game_count: int, dict_path: Path) -> None:
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    while '*' in mask and mistakes < 6:
-        show_current_state(mask, mistakes)
+    while '*' in mask and mistakes < len(stages):
+        show_current_state(mask, mistakes, stages)
         letter = enter_letter(used_letters)
         mask, mistakes = process_letter(letter, word, mask, mistakes)
 
-    show_current_state(mask, mistakes)
+    show_current_state(mask, mistakes, stages)
     print_final_message(mask, word)
 
 
@@ -82,12 +83,13 @@ def main() -> None:
     print(WELCOME_MESSAGE)
     game_count = 0
     dict_path = DICT_PATH
+    stages = STAGES
 
     while True:
         decision = input('Начать новую игру (1) или выйти из приложения(2)? Введите 1 или 2:\n')
 
         if decision == '1':
-            run_game(game_count, dict_path)
+            run_game(game_count, dict_path, stages)
             game_count += 1
 
         elif decision == '2':

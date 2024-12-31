@@ -23,16 +23,6 @@ from pathlib import Path
 from random import randrange
 from typing import Any
 
-from hangman.params import (
-    BODY,
-    EMPTY,
-    HEAD,
-    L_HAND,
-    L_LEG,
-    R_HAND,
-    R_LEG,
-)
-
 
 def prepare_screen(game_count: int) -> None:
     """Подготавливает экран для новой игры.
@@ -92,18 +82,8 @@ def init_start_params(dict_path: Path) -> dict[str, Any]:
     return start_params
 
 
-def build_hangman(mistakes: int) -> str:
+def build_hangman(mistakes: int, stages: list[str]) -> str:
     """Возвращает текущую сцену виселицы в зависимости от числа ошибок."""
-
-    stages = [
-        EMPTY,
-        HEAD,
-        BODY,
-        R_HAND,
-        L_HAND,
-        R_LEG,
-        L_LEG,
-    ]
 
     if 0 <= mistakes <= len(stages) - 1:
         return stages[mistakes]
@@ -113,6 +93,7 @@ def build_hangman(mistakes: int) -> str:
 def show_current_state(
     mask: str,
     mistakes: int,
+    stages: list[str],
 ) -> None:
     """Отображает текущее состояние маски слова и количество ошибок.
 
@@ -130,7 +111,7 @@ def show_current_state(
     print(
         ' '.join(mask),
         f'\n\nКоличество ошибок: {mistakes}\n',
-        f'{build_hangman(mistakes)}',
+        f'{build_hangman(mistakes, stages)}',
     )
 
 
