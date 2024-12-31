@@ -1,22 +1,3 @@
-"""
-Модуль для запуска игры "Виселица".
-
-Этот модуль управляет циклом игры, отображает приветственное сообщение,
-обрабатывает ввод пользователя для начала новой игры или выхода,
-и определяет, выиграл ли игрок.
-
-Константы:
------------
-- WELCOME_MESSAGE: Приветственное сообщение, выводимое при запуске игры.
-
-Функции:
----------
-- print_final_message: Выводит финальное сообщение о результате игры (победа или поражение).
-- run_game: Основной игровой цикл, который инициализирует параметры, управляет состоянием игры и обрабатывает ходы.
-- main: Основная функция, отображающая приветственное сообщение и предлагающая начать новую игру или выйти
-        из приложения.
-"""
-
 from pathlib import Path
 
 from hangman.letter import enter_letter
@@ -60,7 +41,7 @@ def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    while '*' in mask and mistakes < len(stages):
+    while '*' in mask and mistakes < len(stages) - 1:
         show_current_state(mask, mistakes, stages)
         letter = enter_letter(used_letters)
         mask, mistakes = process_letter(letter, word, mask, mistakes)
