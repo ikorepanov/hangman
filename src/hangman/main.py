@@ -16,11 +16,13 @@ from hangman.tools import (
 
 def is_word_guessed(mask: list[str], word: str) -> bool:
     """Проверяет, отгадано ли слово."""
+
     return ''.join(mask) == word
 
 
 def is_game_lost(mistakes: int, stages: list[str]) -> bool:
     """Проверяет, проиграна ли игра."""
+
     return mistakes == len(stages) - 1
 
 
