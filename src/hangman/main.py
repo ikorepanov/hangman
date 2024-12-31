@@ -41,7 +41,7 @@ def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    while '*' in mask and mistakes < len(stages) - 1:
+    while ''.join(mask) != word and mistakes < len(stages) - 1:
         show_current_state(mask, mistakes, stages)
         letter = enter_letter(used_letters)
         mask, mistakes = process_letter(letter, word, mask, mistakes)
