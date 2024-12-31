@@ -1,7 +1,7 @@
 import re
 
 
-def is_cyrillic_letter(letter: str) -> bool:
+def is_cyrillic(letter: str) -> bool:
     """Проверяет, является ли символ буквой русского алфавита."""
 
     return bool(re.fullmatch('[ёа-я]', letter))
@@ -19,7 +19,7 @@ def is_already_used(
 def validate_letter(letter: str, used_letters: list[str]) -> tuple[bool, str]:
     """Проверяет, является ли введённая буква валидной."""
 
-    if not is_cyrillic_letter(letter):
+    if not is_cyrillic(letter):
         return False, 'Необходимо использовать буквы русского алфавита: а - я (А - Я)'
     if is_already_used(letter, used_letters):
         list_used_letters = ', '.join(used_letters)

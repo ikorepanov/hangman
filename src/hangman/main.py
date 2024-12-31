@@ -14,16 +14,14 @@ from hangman.tools import (
 )
 
 
-def print_final_message(
-    mask: list[str],
-    word: str,
-) -> None:
-    """Выводит сообщение о победе или поражении в игре."""
+def is_word_guessed(mask: list[str], word: str) -> bool:
+    """Проверяет, отгадано ли слово."""
+    return ''.join(mask) == word
 
-    if ''.join(mask) == word:
-        print('Поздравляем! Вы выиграли!\n')
-    else:
-        print(f'К сожалению, вы проиграли! Было загадано слово "{word}"\n')
+
+def is_game_lost(mistakes: int, stages: list[str]) -> bool:
+    """Проверяет, проиграна ли игра."""
+    return mistakes == len(stages) - 1
 
 
 def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
@@ -41,13 +39,20 @@ def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    while ''.join(mask) != word and mistakes < len(stages) - 1:
-        show_current_state(mask, mistakes, stages)
+    show_current_state(mask, mistakes, stages)
+
+    while True:
         letter = enter_letter(used_letters)
         mask, mistakes = process_letter(letter, word, mask, mistakes)
+        show_current_state(mask, mistakes, stages)
 
-    show_current_state(mask, mistakes, stages)
-    print_final_message(mask, word)
+        if is_word_guessed(mask, word):
+            print('Поздравляем! Вы выиграли!\n')
+            break
+
+        if is_game_lost(mistakes, stages):
+            print(f'\033[10BК сожалению, вы проиграли! Было загадано слово "{word}"\n')
+            break
 
 
 def main() -> None:
