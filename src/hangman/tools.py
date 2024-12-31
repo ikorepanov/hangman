@@ -19,12 +19,12 @@
 - open_mask: Открывает буквы в маске, если они угаданы.
 - process_letter: Обрабатывает введённую букву, обновляя маску или увеличивая количество ошибок.
 """
+from pathlib import Path
 from random import randrange
 from typing import Any
 
 from hangman.params import (
     BODY,
-    DICT_PATH,
     EMPTY,
     HEAD,
     L_HAND,
@@ -52,33 +52,36 @@ def prepare_screen(game_count: int) -> None:
         print('\033[16F\033[J', end='')
 
 
-def get_random_word(default: str | None) -> str:
-    """Возвращает случайное слово из файла словаря.
+def get_random_word(dict_path: Path, default: str = 'виселица') -> str:
+    """Возвращает случайное слово из файла словаря, или значение по умолчанию, если файл пуст или не существует."""
 
-    Читает файл словаря и выбирает случайное слово. Если файл пуст, возвращает
-    заданное значение по умолчанию.
+    try:
+        with dict_path.open('r', encoding='UTF-8') as fhand:
+            word = default
+            line_count = 0
 
-    :param default: Значение по умолчанию, если не удалось выбрать слово
-    :type default: str | None
-    :return: Случайное слово из словаря
-    :rtype: str
-    """
+            for index, line in enumerate(fhand, start=1):
+                line_count += 1
+                # С вероятностью 1/index выбираем текущее слово
+                if randrange(index) == 0:
+                    word = line.strip()
 
-    with DICT_PATH.open('r', encoding='UTF-8') as fhand:
-        word = default
-        for index, aline in enumerate(fhand, start=1):
-            if randrange(index) == 0:
-                word = aline
-        if word is not None:
-            return word.strip()
-        return ''
+            if line_count == 0:  # Если файл пуст
+                print(f'Файл {dict_path} пуст. Используется слово по умолчанию.')
+                return default
+
+            return word
+
+    except FileNotFoundError:
+        print(f'Файл {dict_path} не найден. Используется слово по умолчанию.')
+        return default
 
 
-def init_start_params() -> dict[str, Any]:
+def init_start_params(dict_path: Path) -> dict[str, Any]:
     """Инициализирует стартовые параметры игры и возвращает их в виде словаря."""
 
     start_params: dict[str, Any] = {}
-    word = get_random_word(default=None)
+    word = get_random_word(dict_path)
 
     start_params['word'] = word
     start_params['mask'] = ['*'] * len(word)
@@ -86,7 +89,6 @@ def init_start_params() -> dict[str, Any]:
     start_params['used_letters'] = []
 
     print('Отгадайте следующее слово:')
-
     return start_params
 
 
