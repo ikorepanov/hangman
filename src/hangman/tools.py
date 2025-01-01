@@ -104,34 +104,3 @@ def open_mask(
         if char == letter:
             mask[index] = letter
     return mask
-
-
-def process_letter(
-    letter: str,
-    word: str,
-    mask: list[str],
-    mistakes: int,
-) -> tuple[list[str], int]:
-    """Обрабатывает введённую пользователем букву.
-
-    Если буква угадана, обновляет маску, в противном случае увеличивает
-    количество ошибок.
-
-    :param letter: Введённая пользователем буква
-    :type letter: str
-    :param word: Загаданное словао
-    :type word: str
-    :param mask: Текущая маска слова
-    :type mask: str
-    :param mistakes: Количество сделанных ошибок
-    :type mistakes: int
-    :return: Обновлённая маска и количество ошибок
-    :rtype: tuple[str, int]
-    """
-
-    if letter in word:
-        mask = open_mask(mask, word, letter)
-    else:
-        mistakes += 1
-    print('\033[12F\033[J', end='')
-    return mask, mistakes
