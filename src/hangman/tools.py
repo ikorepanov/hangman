@@ -57,7 +57,6 @@ def init_start_params(dict_path: Path) -> dict[str, Any]:
     start_params['mistakes'] = 0
     start_params['used_letters'] = []
 
-    print('Отгадайте следующее слово:')
     return start_params
 
 

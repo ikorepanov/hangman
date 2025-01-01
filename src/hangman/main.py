@@ -9,7 +9,7 @@ from hangman.params import (
 from hangman.tools import (
     init_start_params,
     prepare_screen,
-    process_letter,
+    open_mask,
     show_current_state,
 )
 
@@ -41,11 +41,19 @@ def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
+    print('Отгадайте следующее слово:')
     show_current_state(mask, mistakes, stages)
 
     while True:
         letter = enter_letter(used_letters)
-        mask, mistakes = process_letter(letter, word, mask, mistakes)
+
+        print('\033[12F\033[J', end='')
+
+        if letter in word:
+            mask = open_mask(mask, word, letter)
+        else:
+            mistakes += 1
+
         show_current_state(mask, mistakes, stages)
 
         if is_word_guessed(mask, word):
