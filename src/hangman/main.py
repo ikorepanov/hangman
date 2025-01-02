@@ -50,6 +50,12 @@ def move_cursor_up(lines: int) -> str:
     return f'\033[{lines}F'
 
 
+def send_ansi(sequence: str) -> None:
+    """Отправляет ANSI-последовательность в терминал."""
+
+    print(sequence, end='')
+
+
 def enter_letter(used_letters: list[str]) -> str:
     """Запрашивает ввод буквы, проверяет её допустимость и добавляет в список использованных букв."""
 
@@ -92,13 +98,13 @@ def get_random_word(
                     word = line.strip()
 
             if line_count == 0:  # Если файл пуст
-                print(f'Файл {dict_path} пуст. Используется слово по умолчанию.')
+                print(f'NB! Файл {dict_path} пуст.\nИспользуется слово по умолчанию.\n')
                 return default
 
             return word
 
     except FileNotFoundError:
-        print(f'Файл {dict_path} не найден. Используется слово по умолчанию.')
+        print(f'NB! Файл {dict_path} не найден.\nИспользуется слово по умолчанию.\n')
         return default
 
 
@@ -186,12 +192,6 @@ def is_game_lost(
     """Проверяет, проиграна ли игра."""
 
     return mistakes == len(stages) - 1
-
-
-def send_ansi(sequence: str) -> None:
-    """Отправляет ANSI-последовательность в терминал."""
-
-    print(sequence, end='')
 
 
 def run_game(
