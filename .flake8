@@ -21,7 +21,3 @@ ignore = S301, S311,
     DAR201, DAR202,
     DAR401,
     RST202, RST203, RST206,
-
-per-file-ignores =
-    # need backslash as a left hand for hangman
-    hangman/tools.py: W605
