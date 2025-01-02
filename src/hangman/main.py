@@ -4,6 +4,7 @@ from random import randrange
 from typing import Any
 
 from hangman.params import (
+    CLEAR_CURRENT_LINE,
     CLEAR_SCREEN_TO_END,
     DICT_PATH,
     RESTORE_CURSOR_POSITION,
@@ -38,9 +39,15 @@ def validate_letter(
         return False, 'Необходимо использовать буквы русского алфавита: а - я (А - Я)'
 
     if is_already_used(letter, used_letters):
-        return False, 'Вы уже вводили эту букву (см. Использованные буквы)'
+        return False, f'Вы уже вводили букву "{letter}" (см. Использованные буквы)'
 
     return True, ''
+
+
+def move_cursor_up(lines: int) -> str:
+    """Возвращает ANSI-код для перемещения курсора вверх на указанное количество строк."""
+
+    return f'\033[{lines}F'
 
 
 def enter_letter(used_letters: list[str]) -> str:
@@ -52,7 +59,11 @@ def enter_letter(used_letters: list[str]) -> str:
         is_valid, error_message = validate_letter(letter, used_letters)
 
         if not is_valid:
-            print(f'\n\033[K{error_message}\033[2F\033[K', end='')
+            print()
+            send_ansi(CLEAR_CURRENT_LINE)
+            print(f'{error_message}')
+            send_ansi(move_cursor_up(3))
+            send_ansi(CLEAR_CURRENT_LINE)
             continue
 
         used_letters.append(letter)
@@ -121,9 +132,9 @@ def show_current_state(
 ) -> None:
     """Отображает текущее состояние маски слова, количество ошибок, состояние виселицы и использованные буквы."""
 
-    print(f'{" ".join(mask)}\n\n')
-    print(f'Количество ошибок: {mistakes}')
+    print(f'{" ".join(mask)}')
     print(f'{build_hangman(mistakes, stages)}\n')
+    print(f'Количество ошибок: {mistakes}\n')
     print(f'Использованные буквы: {", ".join(used_letters)}\n')
 
 
@@ -226,7 +237,7 @@ def main() -> None:
     stages = STAGES
 
     while True:
-        decision = input('Начать новую игру (1) или выйти из приложения(2)? Введите 1 или 2:\n')
+        decision = input('Начать новую игру (1) или выйти из приложения (2)?\n\nВведите 1 или 2: ')
 
         if decision == '1':
             send_ansi(RESTORE_CURSOR_POSITION)
@@ -241,7 +252,10 @@ def main() -> None:
             break
 
         else:
-            print('(Нужно ввести 1 или 2)')
+            print()
+            print(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
+            send_ansi(move_cursor_up(3))
+            send_ansi(CLEAR_CURRENT_LINE)
             send_ansi(RESTORE_CURSOR_POSITION)
 
 
