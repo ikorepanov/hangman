@@ -56,6 +56,9 @@ def enter_letter(used_letters: list[str]) -> str:
     while True:
         letter = input('Введите букву: ').lower()
 
+        if len(letter) > 1:
+            letter = letter[0]
+
         is_valid, error_message = validate_letter(letter, used_letters)
 
         if not is_valid:
@@ -247,8 +250,7 @@ def main() -> None:
         elif decision == '2':
             send_ansi(CLEAR_SCREEN_TO_END)
             print()
-            print('Всего доброго!')
-            print()
+            print('Всего доброго!\n')
             break
 
         else:
@@ -256,7 +258,7 @@ def main() -> None:
             print(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
             send_ansi(move_cursor_up(3))
             send_ansi(CLEAR_CURRENT_LINE)
-            send_ansi(RESTORE_CURSOR_POSITION)
+            send_ansi(move_cursor_up(2))
 
 
 if __name__ == '__main__':
