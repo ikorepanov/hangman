@@ -38,7 +38,7 @@ def validate_letter(
         return False, 'Необходимо использовать буквы русского алфавита: а - я (А - Я)'
 
     if is_already_used(letter, used_letters):
-        return False, f'Вы уже вводили, в том числе, эту букву: {", ".join(used_letters)}'
+        return False, 'Вы уже вводили эту букву (см. Использованные буквы)'
 
     return True, ''
 
@@ -116,15 +116,22 @@ def build_hangman(
 def show_current_state(
     mask: str,
     mistakes: int,
+    used_letters: list[str],
     stages: list[str],
 ) -> None:
-    """Отображает текущее состояние маски слова и количество ошибок."""
+    """Отображает текущее состояние маски слова, количество ошибок и состояние виселицы."""
 
-    print(
-        ' '.join(mask),
-        f'\n\nКоличество ошибок: {mistakes}\n',
-        f'{build_hangman(mistakes, stages)}',
-    )
+    hangman = build_hangman(mistakes, stages)
+
+    print(f"""
+{' '.join(mask)}
+
+Количество ошибок: {mistakes}
+
+Использованные буквы: {', '.join(used_letters)}
+
+{hangman}
+""")
 
 
 def open_mask(
@@ -195,7 +202,7 @@ def run_game(
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    show_current_state(mask, mistakes, stages)
+    show_current_state(mask, mistakes, used_letters, stages)
 
     while True:
         letter = enter_letter(used_letters)
@@ -205,7 +212,7 @@ def run_game(
 
         mask, mistakes = process_letter(letter, word, mask, mistakes)
 
-        show_current_state(mask, mistakes, stages)
+        show_current_state(mask, mistakes, used_letters, stages)
 
         if is_word_guessed(mask, word):
             print('Поздравляем! Вы выиграли!\n')
