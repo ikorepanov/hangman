@@ -119,19 +119,12 @@ def show_current_state(
     used_letters: list[str],
     stages: list[str],
 ) -> None:
-    """Отображает текущее состояние маски слова, количество ошибок и состояние виселицы."""
+    """Отображает текущее состояние маски слова, количество ошибок, состояние виселицы и использованные буквы."""
 
-    hangman = build_hangman(mistakes, stages)
-
-    print(f"""
-{' '.join(mask)}
-
-Количество ошибок: {mistakes}
-
-Использованные буквы: {', '.join(used_letters)}
-
-{hangman}
-""")
+    print(f'{" ".join(mask)}\n\n')
+    print(f'Количество ошибок: {mistakes}')
+    print(f'{build_hangman(mistakes, stages)}\n')
+    print(f'Использованные буквы: {", ".join(used_letters)}\n')
 
 
 def open_mask(
