@@ -2,10 +2,10 @@ from pathlib import Path
 
 from hangman.letter import enter_letter
 from hangman.params import (
-    CLEAR_SCREEN_FROM_HERE_TO_THE_END,
+    CLEAR_SCREEN_TO_END,
     DICT_PATH,
-    REMEMBERING_THE_CURSOR_START_POSITION,
-    RETURN_TO_THE_START_POSITION_OF_THE_CURSOR,
+    RESTORE_CURSOR_POSITION,
+    SAVE_CURSOR_POSITION,
     STAGES,
     WELCOME_MESSAGE,
 )
@@ -28,10 +28,16 @@ def is_game_lost(mistakes: int, stages: list[str]) -> bool:
     return mistakes == len(stages) - 1
 
 
+def send_ansi(sequence: str) -> None:
+    """Отправляет ANSI-последовательность в терминал."""
+
+    print(sequence, end='')
+
+
 def run_game(dict_path: Path, stages: list[str]) -> None:
     """Основной цикл игры "Виселица"."""
 
-    print(REMEMBERING_THE_CURSOR_START_POSITION, end='')
+    send_ansi(SAVE_CURSOR_POSITION)
 
     start_params = init_start_params(dict_path)
 
@@ -45,8 +51,8 @@ def run_game(dict_path: Path, stages: list[str]) -> None:
     while True:
         letter = enter_letter(used_letters)
 
-        print(RETURN_TO_THE_START_POSITION_OF_THE_CURSOR, end='')
-        print(CLEAR_SCREEN_FROM_HERE_TO_THE_END, end='')
+        send_ansi(RESTORE_CURSOR_POSITION)
+        send_ansi(CLEAR_SCREEN_TO_END)
 
         mask, mistakes = process_letter(letter, word, mask, mistakes)
 
@@ -65,7 +71,7 @@ def main() -> None:
     """Основная функция, запускающая приложение."""
 
     print(WELCOME_MESSAGE)
-    print(REMEMBERING_THE_CURSOR_START_POSITION, end='')
+    send_ansi(SAVE_CURSOR_POSITION)
 
     dict_path = DICT_PATH
     stages = STAGES
@@ -74,12 +80,12 @@ def main() -> None:
         decision = input('Начать новую игру (1) или выйти из приложения(2)? Введите 1 или 2:\n')
 
         if decision == '1':
-            print(RETURN_TO_THE_START_POSITION_OF_THE_CURSOR, end='')
-            print(CLEAR_SCREEN_FROM_HERE_TO_THE_END, end='')
+            send_ansi(RESTORE_CURSOR_POSITION)
+            send_ansi(CLEAR_SCREEN_TO_END)
             run_game(dict_path, stages)
 
         elif decision == '2':
-            print(CLEAR_SCREEN_FROM_HERE_TO_THE_END, end='')
+            send_ansi(CLEAR_SCREEN_TO_END)
             print()
             print('Всего доброго!')
             print()
@@ -87,7 +93,7 @@ def main() -> None:
 
         else:
             print('(Нужно ввести 1 или 2)')
-            print(RETURN_TO_THE_START_POSITION_OF_THE_CURSOR, end='')
+            send_ansi(RESTORE_CURSOR_POSITION)
 
 
 if __name__ == '__main__':
