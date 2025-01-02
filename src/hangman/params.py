@@ -6,9 +6,9 @@ DICT_PATH = CWD / 'data/dictionary.txt'
 WELCOME_MESSAGE = """
  _____________________________________________________________
 |                                                             |
-|                                                             |
 |              Вас приветствует игра "Виселица!               |
 |                                                             |
+|               Отгадайте зашифрованное слово                 |
 |_____________________________________________________________|
 """
 
@@ -70,3 +70,7 @@ L_LEG = """
 """
 
 STAGES = [EMPTY, HEAD, BODY, R_HAND, L_HAND, R_LEG, L_LEG]
+
+REMEMBERING_THE_CURSOR_START_POSITION = '\033[s'
+RETURN_TO_THE_START_POSITION_OF_THE_CURSOR = '\033[u'
+CLEAR_SCREEN_FROM_HERE_TO_THE_END = '\033[J'

@@ -2,14 +2,16 @@ from pathlib import Path
 
 from hangman.letter import enter_letter
 from hangman.params import (
+    CLEAR_SCREEN_FROM_HERE_TO_THE_END,
     DICT_PATH,
+    REMEMBERING_THE_CURSOR_START_POSITION,
+    RETURN_TO_THE_START_POSITION_OF_THE_CURSOR,
     STAGES,
     WELCOME_MESSAGE,
 )
 from hangman.tools import (
     init_start_params,
-    prepare_screen,
-    open_mask,
+    process_letter,
     show_current_state,
 )
 
@@ -26,14 +28,11 @@ def is_game_lost(mistakes: int, stages: list[str]) -> bool:
     return mistakes == len(stages) - 1
 
 
-def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
-    """Основной цикл игры "Виселица".
+def run_game(dict_path: Path, stages: list[str]) -> None:
+    """Основной цикл игры "Виселица"."""
 
-    Инициализирует параметры игры, управляет процессом угадывания букв и выводит текущее состояние игры.
-    Игра продолжается, пока игрок не отгадает слово или количество ошибок не превысит допустимое значение.
-    """
+    print(REMEMBERING_THE_CURSOR_START_POSITION, end='')
 
-    prepare_screen(game_count)
     start_params = init_start_params(dict_path)
 
     word = start_params['word']
@@ -41,18 +40,15 @@ def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    print('Отгадайте следующее слово:')
     show_current_state(mask, mistakes, stages)
 
     while True:
         letter = enter_letter(used_letters)
 
-        print('\033[12F\033[J', end='')
+        print(RETURN_TO_THE_START_POSITION_OF_THE_CURSOR, end='')
+        print(CLEAR_SCREEN_FROM_HERE_TO_THE_END, end='')
 
-        if letter in word:
-            mask = open_mask(mask, word, letter)
-        else:
-            mistakes += 1
+        mask, mistakes = process_letter(letter, word, mask, mistakes)
 
         show_current_state(mask, mistakes, stages)
 
@@ -66,18 +62,11 @@ def run_game(game_count: int, dict_path: Path, stages: list[str]) -> None:
 
 
 def main() -> None:
-    """Основная функция, запускающая приложение.
-
-    Выводит приветственное сообщение и предлагает пользователю выбрать:
-    начать новую игру или выйти из приложения. Запускает новую игру при выборе 1
-    или завершает приложение при выборе 2.
-
-    :return: None
-    :rtype: None
-    """
+    """Основная функция, запускающая приложение."""
 
     print(WELCOME_MESSAGE)
-    game_count = 0
+    print(REMEMBERING_THE_CURSOR_START_POSITION, end='')
+
     dict_path = DICT_PATH
     stages = STAGES
 
@@ -85,15 +74,20 @@ def main() -> None:
         decision = input('Начать новую игру (1) или выйти из приложения(2)? Введите 1 или 2:\n')
 
         if decision == '1':
-            run_game(game_count, dict_path, stages)
-            game_count += 1
+            print(RETURN_TO_THE_START_POSITION_OF_THE_CURSOR, end='')
+            print(CLEAR_SCREEN_FROM_HERE_TO_THE_END, end='')
+            run_game(dict_path, stages)
 
         elif decision == '2':
-            print('\033[K\033[EВсего доброго!\n')
+            print(CLEAR_SCREEN_FROM_HERE_TO_THE_END, end='')
+            print()
+            print('Всего доброго!')
+            print()
             break
 
         else:
-            print('(Нужно ввести 1 или 2)\033[F\033[K\033[F', end='')
+            print('(Нужно ввести 1 или 2)')
+            print(RETURN_TO_THE_START_POSITION_OF_THE_CURSOR, end='')
 
 
 if __name__ == '__main__':

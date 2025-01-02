@@ -3,24 +3,6 @@ from random import randrange
 from typing import Any
 
 
-def prepare_screen(game_count: int) -> None:
-    """Подготавливает экран для новой игры.
-
-    Если это первая игра, поднимает курсор на 2 строки вверх и очищает экран,
-    в противном случае поднимает курсор на 16 строк вверх и очищает предыдущие выводы.
-
-    :param game_count: Количество уже сыгранных игр
-    :type game_count: int
-    :return: None
-    :rtype: None
-    """
-
-    if game_count == 0:
-        print('\033[2F\033[J', end='')
-    else:
-        print('\033[16F\033[J', end='')
-
-
 def get_random_word(dict_path: Path, default: str = 'виселица') -> str:
     """Возвращает случайное слово из файла словаря, или значение по умолчанию, если файл пуст или не существует."""
 
@@ -53,7 +35,7 @@ def init_start_params(dict_path: Path) -> dict[str, Any]:
     word = get_random_word(dict_path)
 
     start_params['word'] = word
-    start_params['mask'] = ['*'] * len(word)
+    start_params['mask'] = ['_'] * len(word)
     start_params['mistakes'] = 0
     start_params['used_letters'] = []
 
@@ -104,3 +86,19 @@ def open_mask(
         if char == letter:
             mask[index] = letter
     return mask
+
+
+def process_letter(
+    letter: str,
+    word: str,
+    mask: list[str],
+    mistakes: int,
+) -> tuple[list[str], int]:
+    """Обрабатывает введённую пользователем букву."""
+
+    if letter in word:
+        mask = open_mask(mask, word, letter)
+    else:
+        mistakes += 1
+
+    return mask, mistakes
