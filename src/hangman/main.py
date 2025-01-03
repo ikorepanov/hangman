@@ -1,4 +1,5 @@
 import re
+import sys
 from pathlib import Path
 from random import randrange
 from typing import Any
@@ -8,6 +9,7 @@ from hangman.params import (
     CLEAR_SCREEN_TO_END,
     CYRILLIC_LETTER_MSG,
     DICT_PATH,
+    FILE_HAS_PROBLEM_MSG,
     RESTORE_CURSOR_POSITION,
     SAVE_CURSOR_POSITION,
     STAGES,
@@ -82,46 +84,45 @@ def enter_letter(used_letters: list[str]) -> str:
         return letter
 
 
-def get_random_word(
-    dict_path: Path,
-    default: str = 'виселица',
-) -> str:
-    """Возвращает случайное слово из файла словаря, или значение по умолчанию, если файл пуст или не существует."""
+class FileProcessingError(Exception):
+    """Кастомное исключение для ошибок, связанных с обработкой файла."""
 
-    try:
-        with dict_path.open('r', encoding='UTF-8') as fhand:
-            word = default
-            line_count = 0
+    pass
 
-            for index, line in enumerate(fhand, start=1):
-                line_count += 1
-                # С вероятностью 1/index выбираем текущее слово
-                if randrange(0, index) == 0:
-                    word = line.strip()
 
-            if line_count == 0:  # Если файл пуст
-                print(f'NB! Файл {dict_path} пуст.\nИспользуется слово по умолчанию.\n')
-                return default
+def get_random_word(dict_path: Path) -> str:
+    """Возвращает случайное слово из файла."""
 
-            return word
+    if not dict_path.exists():
+        raise FileProcessingError(f'Файл {dict_path} не найден.\n')
 
-    except FileNotFoundError:
-        print(f'NB! Файл {dict_path} не найден.\nИспользуется слово по умолчанию.\n')
-        return default
+    with dict_path.open('r', encoding='UTF-8') as fhand:
+        word = None
+
+        for index, line in enumerate(fhand, start=1):
+            if randrange(0, index) == 0:
+                word = line.strip()
+
+        if word is None:
+            raise FileProcessingError(f'Файл {dict_path} пуст.\n')
+
+        return word
 
 
 def init_start_params(dict_path: Path) -> dict[str, Any]:
     """Инициализирует стартовые параметры игры и возвращает их в виде словаря."""
 
-    start_params: dict[str, Any] = {}
-    word = get_random_word(dict_path)
+    try:
+        word = get_random_word(dict_path)
+    except FileProcessingError:
+        raise
 
-    start_params['word'] = word
-    start_params['mask'] = ['_'] * len(word)
-    start_params['mistakes'] = 0
-    start_params['used_letters'] = []
-
-    return start_params
+    return {
+        'word': word,
+        'mask': ['_'] * len(word),
+        'mistakes': 0,
+        'used_letters': []
+    }
 
 
 def build_hangman(
@@ -204,7 +205,10 @@ def run_game(
 
     send_ansi(SAVE_CURSOR_POSITION)
 
-    start_params = init_start_params(dict_path)
+    try:
+        start_params = init_start_params(dict_path)
+    except FileProcessingError:
+        raise
 
     word = start_params['word']
     mask = start_params['mask']
@@ -247,7 +251,11 @@ def main() -> None:
         if decision == '1':
             send_ansi(RESTORE_CURSOR_POSITION)
             send_ansi(CLEAR_SCREEN_TO_END)
-            run_game(dict_path, stages)
+            try:
+                run_game(dict_path, stages)
+            except FileProcessingError as error:
+                print(error)
+                sys.exit(1)
 
         elif decision == '2':
             send_ansi(CLEAR_SCREEN_TO_END)
