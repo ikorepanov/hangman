@@ -96,7 +96,7 @@ def get_random_word(
             for index, line in enumerate(fhand, start=1):
                 line_count += 1
                 # С вероятностью 1/index выбираем текущее слово
-                if randrange(index) == 0:
+                if randrange(0, index) == 0:
                     word = line.strip()
 
             if line_count == 0:  # Если файл пуст
