@@ -1,6 +1,13 @@
 from pathlib import Path
 
-CWD = Path(__file__).parents[2]
+if '__file__' not in globals():
+    raise RuntimeError('Переменная __file__ не определена')
+
+path = Path(__file__)
+if len(path.parents) < 3:
+    raise ValueError('Недостаточно уровней в пути для доступа к parents[2]')
+
+CWD = path.parents[2]
 DICT_PATH = CWD / 'data/dictionary.txt'
 
 WELCOME_MESSAGE = """
