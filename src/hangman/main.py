@@ -6,10 +6,12 @@ from typing import Any
 from hangman.params import (
     CLEAR_CURRENT_LINE,
     CLEAR_SCREEN_TO_END,
+    CYRILLIC_LETTER_MSG,
     DICT_PATH,
     RESTORE_CURSOR_POSITION,
     SAVE_CURSOR_POSITION,
     STAGES,
+    USED_LETTER_MSG,
     WELCOME_MESSAGE,
 )
 
@@ -36,10 +38,10 @@ def validate_letter(
     """Проверяет, является ли введённая буква валидной."""
 
     if not is_cyrillic(letter):
-        return False, 'Необходимо использовать буквы русского алфавита: а - я (А - Я)'
+        return False, CYRILLIC_LETTER_MSG
 
     if is_already_used(letter, used_letters):
-        return False, f'Вы уже вводили букву "{letter}" (см. Использованные буквы)'
+        return False, USED_LETTER_MSG.format(letter)
 
     return True, ''
 
