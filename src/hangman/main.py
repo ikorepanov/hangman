@@ -2,7 +2,7 @@ import re
 import sys
 from pathlib import Path
 from random import randrange
-from typing import Any
+from typing import Any, NamedTuple
 
 from hangman.params import (
     CLEAR_CURRENT_LINE,
@@ -39,14 +39,9 @@ def is_already_used(
     return letter in used_letters
 
 
-class ValidationResult:
-    def __init__(
-        self,
-        is_valid: bool,
-        message: str = '',
-    ):
-        self.is_valid = is_valid
-        self.message = message
+class ValidationResult(NamedTuple):
+    is_valid: bool
+    message: str = ''
 
 
 def validate_letter(
