@@ -273,38 +273,49 @@ def run_game(
             break
 
 
+def show_not_one_two_decision_message(decision: str) -> None:
+    print()
+    send_ansi(CLEAR_CURRENT_LINE)
+    print(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
+    send_ansi(move_cursor_up(3))
+    send_ansi(CLEAR_CURRENT_LINE)
+    send_ansi(move_cursor_up(2))
+
+
+def get_user_decision() -> str:
+    """Докстринга."""
+
+    while True:
+        decision = input('Начать новую игру (1) или выйти из приложения (2)?\n\nВведите 1 или 2: ')
+
+        if decision in {'1', '2'}:
+            return decision
+
+        show_not_one_two_decision_message(decision)
+
+
 def main() -> None:
     """Основная функция, запускающая приложение."""
 
     print(WELCOME_MESSAGE)
     send_ansi(SAVE_CURSOR_POSITION)
 
-    dict_path = DICT_PATH
-    stages = STAGES
-
     while True:
-        decision = input('Начать новую игру (1) или выйти из приложения (2)?\n\nВведите 1 или 2: ')
+        decision = get_user_decision()
 
         if decision == '1':
             restore_cursor_and_clear_screen()
             try:
-                run_game(dict_path, stages)
+                run_game(DICT_PATH, STAGES)
             except DictionaryFileError as error:
                 print(error)
                 sys.exit(1)
 
-        elif decision == '2':
+        else:  # decision == '2':
             send_ansi(CLEAR_SCREEN_TO_END)
             print()
             print('Всего доброго!\n')
             break
-
-        else:
-            print()
-            print(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
-            send_ansi(move_cursor_up(3))
-            send_ansi(CLEAR_CURRENT_LINE)
-            send_ansi(move_cursor_up(2))
 
 
 if __name__ == '__main__':
