@@ -306,7 +306,7 @@ def handle_file_error(error: DictionaryFileError) -> None:
 
 
 def main() -> None:
-    """Основная функция, запускающая приложение."""
+    """Основная функция."""
 
     print(WELCOME_MESSAGE)
     send_ansi(SAVE_CURSOR_POSITION)
@@ -314,18 +314,16 @@ def main() -> None:
     while True:
         decision = get_user_decision()
 
-        if decision == '1':
-            restore_cursor_and_clear_screen()
-            try:
-                run_game(DICT_PATH, STAGES)
-            except DictionaryFileError as error:
-                handle_file_error(error)
-
-        else:  # decision == '2':
+        if decision == '2':  # Выход
             send_ansi(CLEAR_SCREEN_TO_END)
-            print()
-            print('Всего доброго!\n')
+            print('\nВсего доброго!\n')
             break
+
+        restore_cursor_and_clear_screen()
+        try:
+            run_game(DICT_PATH, STAGES)
+        except DictionaryFileError as error:
+            handle_file_error(error)
 
 
 if __name__ == '__main__':
