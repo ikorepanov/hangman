@@ -19,32 +19,6 @@ from hangman.params import (
 )
 
 
-class ValidationResult(NamedTuple):
-    is_valid: bool
-    message: str = ''
-
-
-def validate_letter(
-    letter: str,
-    used_letters: list[str],
-) -> ValidationResult:
-    """Проверяет, является ли введённая буква валидной."""
-
-    if not letter:
-        return ValidationResult(False, EMPTY_LINE_MSG)
-
-    if len(letter) > 1:
-        return ValidationResult(False, MORE_THAN_ONE_SYMBOL_MSK)
-
-    if not re.fullmatch('[ёа-я]', letter):
-        return ValidationResult(False, CYRILLIC_LETTER_MSG)
-
-    if letter in used_letters:
-        return ValidationResult(False, USED_LETTER_MSG.format(letter))
-
-    return ValidationResult(True)
-
-
 def move_cursor_up(lines: int) -> str:
     """Возвращает ANSI-код для перемещения курсора вверх на указанное количество строк."""
 
@@ -72,6 +46,32 @@ def display_error_and_retry(error_message: str) -> None:
     print(error_message)
     send_ansi(move_cursor_up(3))
     send_ansi(CLEAR_CURRENT_LINE)
+
+
+class ValidationResult(NamedTuple):
+    is_valid: bool
+    message: str = ''
+
+
+def validate_letter(
+    letter: str,
+    used_letters: list[str],
+) -> ValidationResult:
+    """Проверяет, является ли введённая буква валидной."""
+
+    if not letter:
+        return ValidationResult(False, EMPTY_LINE_MSG)
+
+    if len(letter) > 1:
+        return ValidationResult(False, MORE_THAN_ONE_SYMBOL_MSK)
+
+    if not re.fullmatch('[ёа-я]', letter):
+        return ValidationResult(False, CYRILLIC_LETTER_MSG)
+
+    if letter in used_letters:
+        return ValidationResult(False, USED_LETTER_MSG.format(letter))
+
+    return ValidationResult(True)
 
 
 def enter_letter(used_letters: list[str]) -> str:
@@ -204,24 +204,6 @@ def process_letter(
     return LetterProcessingResult(mask, mistakes)
 
 
-def is_word_guessed(
-    mask: list[str],
-    word: str,
-) -> bool:
-    """Проверяет, отгадано ли слово."""
-
-    return ''.join(mask) == word
-
-
-def is_game_lost(
-    mistakes: int,
-    stages: list[str],
-) -> bool:
-    """Проверяет, проиграна ли игра."""
-
-    return mistakes == len(stages) - 1
-
-
 def run_game(
     dict_path: Path,
     stages: list[str],
@@ -242,17 +224,17 @@ def run_game(
     while True:
         letter = enter_letter(used_letters)
         processing_result = process_letter(letter, word, mask, mistakes)
-        
+
         mask = processing_result.mask
         mistakes = processing_result.mistakes
         restore_cursor_and_clear_screen()
         render_game_state(mask, mistakes, used_letters, stages)
 
-        if is_word_guessed(mask, word):
+        if ''.join(mask) == word:
             print('Поздравляем! Вы выиграли!\n')
             break
 
-        if is_game_lost(mistakes, stages):
+        if mistakes == len(stages) - 1:
             print(f'К сожалению, вы проиграли! Было загадано слово "{word}"\n')
             break
 
