@@ -142,10 +142,7 @@ def get_random_word(dict_path: Path) -> str:
 def init_start_params(dict_path: Path) -> dict[str, Any]:
     """Инициализирует стартовые параметры игры и возвращает их в виде словаря."""
 
-    try:
-        word = get_random_word(dict_path)
-    except DictionaryFileError:
-        raise
+    word = get_random_word(dict_path)
 
     return {
         'word': word,
@@ -248,10 +245,7 @@ def run_game(
 
     send_ansi(SAVE_CURSOR_POSITION)
 
-    try:
-        start_params = init_start_params(dict_path)
-    except DictionaryFileError:
-        raise
+    start_params = init_start_params(dict_path)
 
     word = start_params['word']
     mask = start_params['mask']
