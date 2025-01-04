@@ -298,13 +298,6 @@ def get_user_decision() -> str:
         send_ansi(move_cursor_up(2))
 
 
-def handle_file_error(error: DictionaryFileError) -> None:
-    """Выводит в терминал сообщение об ошибке и инициирует выход из приложения."""
-
-    print(error)
-    sys.exit(1)
-
-
 def main() -> None:
     """Основная функция."""
 
@@ -323,7 +316,8 @@ def main() -> None:
         try:
             run_game(DICT_PATH, STAGES)
         except DictionaryFileError as error:
-            handle_file_error(error)
+            print(error)
+            sys.exit(1)
 
 
 if __name__ == '__main__':
