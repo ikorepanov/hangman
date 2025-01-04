@@ -33,7 +33,7 @@ def is_cyrillic(letter: str) -> bool:
 
 def is_already_used(
     letter: str,
-    used_letters: list[str],
+    used_letters: set[str],
 ) -> bool:
     """Проверяет, была ли буква уже введена пользователем."""
 
@@ -53,7 +53,7 @@ class ValidationResult(NamedTuple):
 
 def validate_letter(
     letter: str,
-    used_letters: list[str],
+    used_letters: set[str],
 ) -> ValidationResult:
     """Проверяет, является ли введённая буква валидной."""
 
@@ -101,7 +101,7 @@ def display_error_and_retry(error_message: str) -> None:
     send_ansi(CLEAR_CURRENT_LINE)
 
 
-def enter_letter(used_letters: list[str]) -> str:
+def enter_letter(used_letters: set[str]) -> str:
     """Запрашивает ввод буквы, проверяет её допустимость и добавляет в список использованных букв."""
 
     while True:
@@ -113,7 +113,7 @@ def enter_letter(used_letters: list[str]) -> str:
             display_error_and_retry(result.message)
             continue
 
-        used_letters.append(letter)
+        used_letters.add(letter)
 
         return letter
 
@@ -155,7 +155,7 @@ def init_start_params(dict_path: Path) -> dict[str, Any]:
         'word': word,
         'mask': ['_'] * len(word),
         'mistakes': 0,
-        'used_letters': []
+        'used_letters': set()
     }
 
 
@@ -173,7 +173,7 @@ def build_hangman(
 def format_current_state(
     mask: list[str],
     mistakes: int,
-    used_letters: list[str],
+    used_letters: set[str],
     stages: list[str]
 ) -> str:
     """Формирует набор данных для отображения текущего состояния."""
@@ -189,7 +189,7 @@ def format_current_state(
 def show_current_state(
     mask: list[str],
     mistakes: int,
-    used_letters: list[str],
+    used_letters: set[str],
     stages: list[str],
 ) -> None:
     """Отображает текущее состояние маски слова, количество ошибок, состояние виселицы и использованные буквы."""
@@ -298,6 +298,13 @@ def get_user_decision() -> str:
         send_ansi(move_cursor_up(2))
 
 
+def handle_file_error(error: DictionaryFileError) -> None:
+    """Выводит в терминал сообщение об ошибке и инициирует выход из приложения."""
+
+    print(error)
+    sys.exit(1)
+
+
 def main() -> None:
     """Основная функция, запускающая приложение."""
 
@@ -312,8 +319,7 @@ def main() -> None:
             try:
                 run_game(DICT_PATH, STAGES)
             except DictionaryFileError as error:
-                print(error)
-                sys.exit(1)
+                handle_file_error(error)
 
         else:  # decision == '2':
             send_ansi(CLEAR_SCREEN_TO_END)
