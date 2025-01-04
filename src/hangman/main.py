@@ -159,7 +159,7 @@ def build_hangman(
 
 
 def format_current_state(
-    mask: str,
+    mask: list[str],
     mistakes: int,
     used_letters: list[str],
     stages: list[str]
@@ -175,7 +175,7 @@ def format_current_state(
 
 
 def show_current_state(
-    mask: str,
+    mask: list[str],
     mistakes: int,
     used_letters: list[str],
     stages: list[str],
