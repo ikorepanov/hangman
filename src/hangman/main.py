@@ -198,12 +198,17 @@ def open_mask(
     return mask
 
 
+class LetterProcessingResult(NamedTuple):
+    mask: list[str]
+    mistakes: int
+
+
 def process_letter(
     letter: str,
     word: str,
     mask: list[str],
     mistakes: int,
-) -> tuple[list[str], int]:
+) -> LetterProcessingResult:
     """Обрабатывает введённую пользователем букву."""
 
     if letter in word:
@@ -211,7 +216,7 @@ def process_letter(
     else:
         mistakes += 1
 
-    return mask, mistakes
+    return LetterProcessingResult(mask, mistakes)
 
 
 def is_word_guessed(
@@ -252,7 +257,11 @@ def run_game(
     while True:
         letter = enter_letter(used_letters)
         restore_cursor_and_clear_screen()
-        mask, mistakes = process_letter(letter, word, mask, mistakes)
+
+        result = process_letter(letter, word, mask, mistakes)
+        mask = result.mask
+        mistakes = result.mistakes
+
         show_current_state(mask, mistakes, used_letters, stages)
 
         if is_word_guessed(mask, word):
