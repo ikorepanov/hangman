@@ -19,33 +19,6 @@ from hangman.params import (
 )
 
 
-def is_empty_line(letter: str) -> bool:
-    """Проверяет, ввёл ли пользователь пустую строку."""
-
-    return letter == ''
-
-
-def is_cyrillic(letter: str) -> bool:
-    """Проверяет, является ли символ буквой русского алфавита."""
-
-    return bool(re.fullmatch('[ёа-я]', letter))
-
-
-def is_already_used(
-    letter: str,
-    used_letters: list[str],
-) -> bool:
-    """Проверяет, была ли буква уже введена пользователем."""
-
-    return letter in used_letters
-
-
-def is_more_than_one_symbol(letter: str) -> bool:
-    """Проверяет, не введено ли более одного символа."""
-
-    return len(letter) > 1
-
-
 class ValidationResult(NamedTuple):
     is_valid: bool
     message: str = ''
@@ -57,16 +30,16 @@ def validate_letter(
 ) -> ValidationResult:
     """Проверяет, является ли введённая буква валидной."""
 
-    if is_empty_line(letter):
+    if not letter:
         return ValidationResult(False, EMPTY_LINE_MSG)
 
-    if is_more_than_one_symbol(letter):
+    if len(letter) > 1:
         return ValidationResult(False, MORE_THAN_ONE_SYMBOL_MSK)
 
-    if not is_cyrillic(letter):
+    if not re.fullmatch('[ёа-я]', letter):
         return ValidationResult(False, CYRILLIC_LETTER_MSG)
 
-    if is_already_used(letter, used_letters):
+    if letter in used_letters:
         return ValidationResult(False, USED_LETTER_MSG.format(letter))
 
     return ValidationResult(True)
@@ -186,7 +159,7 @@ def format_current_state(
     )
 
 
-def show_current_state(
+def render_game_state(
     mask: list[str],
     mistakes: int,
     used_letters: list[str],
@@ -264,17 +237,16 @@ def run_game(
     mistakes = start_params['mistakes']
     used_letters = start_params['used_letters']
 
-    show_current_state(mask, mistakes, used_letters, stages)
+    render_game_state(mask, mistakes, used_letters, stages)
 
     while True:
         letter = enter_letter(used_letters)
+        processing_result = process_letter(letter, word, mask, mistakes)
+        
+        mask = processing_result.mask
+        mistakes = processing_result.mistakes
         restore_cursor_and_clear_screen()
-
-        result = process_letter(letter, word, mask, mistakes)
-        mask = result.mask
-        mistakes = result.mistakes
-
-        show_current_state(mask, mistakes, used_letters, stages)
+        render_game_state(mask, mistakes, used_letters, stages)
 
         if is_word_guessed(mask, word):
             print('Поздравляем! Вы выиграли!\n')
