@@ -82,6 +82,8 @@ def restore_cursor_and_clear_screen() -> None:
 
 
 def display_error_and_retry(error_message: str) -> None:
+    """Перемещает курсор, стирая не нужное и печатая сообщение."""
+
     print()
     send_ansi(CLEAR_CURRENT_LINE)
     print(error_message)
@@ -273,17 +275,8 @@ def run_game(
             break
 
 
-def show_not_one_two_decision_message(decision: str) -> None:
-    print()
-    send_ansi(CLEAR_CURRENT_LINE)
-    print(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
-    send_ansi(move_cursor_up(3))
-    send_ansi(CLEAR_CURRENT_LINE)
-    send_ansi(move_cursor_up(2))
-
-
 def get_user_decision() -> str:
-    """Докстринга."""
+    """Принимает от пользователя решение о продолжении игры."""
 
     while True:
         decision = input('Начать новую игру (1) или выйти из приложения (2)?\n\nВведите 1 или 2: ')
@@ -291,7 +284,8 @@ def get_user_decision() -> str:
         if decision in {'1', '2'}:
             return decision
 
-        show_not_one_two_decision_message(decision)
+        display_error_and_retry(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
+        send_ansi(move_cursor_up(2))
 
 
 def main() -> None:
