@@ -9,12 +9,19 @@ from hangman.params import (
     CLEAR_SCREEN_TO_END,
     CYRILLIC_LETTER_MSG,
     DICT_PATH,
+    EMPTY_LINE_MSG,
     RESTORE_CURSOR_POSITION,
     SAVE_CURSOR_POSITION,
     STAGES,
     USED_LETTER_MSG,
     WELCOME_MESSAGE,
 )
+
+
+def is_empty_line(letter: str) -> bool:
+    """Проверяет, ввёл ли пользователь пустую строку."""
+
+    return letter == ''
 
 
 def is_cyrillic(letter: str) -> bool:
@@ -32,19 +39,32 @@ def is_already_used(
     return letter in used_letters
 
 
+class ValidationResult:
+    def __init__(
+        self,
+        is_valid: bool,
+        message: str = '',
+    ):
+        self.is_valid = is_valid
+        self.message = message
+
+
 def validate_letter(
     letter: str,
     used_letters: list[str],
-) -> tuple[bool, str]:
+) -> ValidationResult:
     """Проверяет, является ли введённая буква валидной."""
 
+    if is_empty_line(letter):
+        return ValidationResult(False, EMPTY_LINE_MSG)
+
     if not is_cyrillic(letter):
-        return False, CYRILLIC_LETTER_MSG
+        return ValidationResult(False, CYRILLIC_LETTER_MSG)
 
     if is_already_used(letter, used_letters):
-        return False, USED_LETTER_MSG.format(letter)
+        return ValidationResult(False, USED_LETTER_MSG.format(letter))
 
-    return True, ''
+    return ValidationResult(True)
 
 
 def move_cursor_up(lines: int) -> str:
@@ -59,6 +79,21 @@ def send_ansi(sequence: str) -> None:
     print(sequence, end='')
 
 
+def restore_cursor_and_clear_screen() -> None:
+    """Отправляет в терминал ANSI-коды для возврата курсора в запомненную позицию и очистки экрана."""
+
+    send_ansi(RESTORE_CURSOR_POSITION)
+    send_ansi(CLEAR_SCREEN_TO_END)
+
+
+def display_error_and_retry(error_message: str) -> None:
+    print()
+    send_ansi(CLEAR_CURRENT_LINE)
+    print(error_message)
+    send_ansi(move_cursor_up(3))
+    send_ansi(CLEAR_CURRENT_LINE)
+
+
 def enter_letter(used_letters: list[str]) -> str:
     """Запрашивает ввод буквы, проверяет её допустимость и добавляет в список использованных букв."""
 
@@ -68,14 +103,10 @@ def enter_letter(used_letters: list[str]) -> str:
         if len(letter) > 1:
             letter = letter[0]
 
-        is_valid, error_message = validate_letter(letter, used_letters)
+        result = validate_letter(letter, used_letters)
 
-        if not is_valid:
-            print()
-            send_ansi(CLEAR_CURRENT_LINE)
-            print(f'{error_message}')
-            send_ansi(move_cursor_up(3))
-            send_ansi(CLEAR_CURRENT_LINE)
+        if not result.is_valid:
+            display_error_and_retry(result.message)
             continue
 
         used_letters.append(letter)
@@ -83,7 +114,7 @@ def enter_letter(used_letters: list[str]) -> str:
         return letter
 
 
-class FileProcessingError(Exception):
+class DictionaryFileError(Exception):
     """Кастомное исключение для ошибок, связанных с обработкой файла."""
 
     pass
@@ -93,7 +124,7 @@ def get_random_word(dict_path: Path) -> str:
     """Возвращает случайное слово из файла."""
 
     if not dict_path.exists():
-        raise FileProcessingError(f'Файл {dict_path} не найден.\n')
+        raise DictionaryFileError(f'Файл {dict_path} не найден.\n')
 
     with dict_path.open('r', encoding='UTF-8') as fhand:
         word = None
@@ -103,7 +134,7 @@ def get_random_word(dict_path: Path) -> str:
                 word = line.strip()
 
         if word is None:
-            raise FileProcessingError(f'Файл {dict_path} пуст.\n')
+            raise DictionaryFileError(f'Файл {dict_path} пуст.\n')
 
         return word
 
@@ -113,7 +144,7 @@ def init_start_params(dict_path: Path) -> dict[str, Any]:
 
     try:
         word = get_random_word(dict_path)
-    except FileProcessingError:
+    except DictionaryFileError:
         raise
 
     return {
@@ -135,6 +166,22 @@ def build_hangman(
     return ''
 
 
+def format_current_state(
+    mask: str,
+    mistakes: int,
+    used_letters: list[str],
+    stages: list[str]
+) -> str:
+    """Формирует набор данных для отображения текущего состояния."""
+
+    return (
+        f'{" ".join(mask)}\n'
+        f'{build_hangman(mistakes, stages)}\n\n'
+        f'Количество ошибок: {mistakes}\n\n'
+        f'Использованные буквы: {", ".join(used_letters)}\n'
+    )
+
+
 def show_current_state(
     mask: str,
     mistakes: int,
@@ -143,10 +190,7 @@ def show_current_state(
 ) -> None:
     """Отображает текущее состояние маски слова, количество ошибок, состояние виселицы и использованные буквы."""
 
-    print(f'{" ".join(mask)}')
-    print(f'{build_hangman(mistakes, stages)}\n')
-    print(f'Количество ошибок: {mistakes}\n')
-    print(f'Использованные буквы: {", ".join(used_letters)}\n')
+    print(format_current_state(mask, mistakes, used_letters, stages))
 
 
 def open_mask(
@@ -206,7 +250,7 @@ def run_game(
 
     try:
         start_params = init_start_params(dict_path)
-    except FileProcessingError:
+    except DictionaryFileError:
         raise
 
     word = start_params['word']
@@ -218,12 +262,8 @@ def run_game(
 
     while True:
         letter = enter_letter(used_letters)
-
-        send_ansi(RESTORE_CURSOR_POSITION)
-        send_ansi(CLEAR_SCREEN_TO_END)
-
+        restore_cursor_and_clear_screen()
         mask, mistakes = process_letter(letter, word, mask, mistakes)
-
         show_current_state(mask, mistakes, used_letters, stages)
 
         if is_word_guessed(mask, word):
@@ -248,11 +288,10 @@ def main() -> None:
         decision = input('Начать новую игру (1) или выйти из приложения (2)?\n\nВведите 1 или 2: ')
 
         if decision == '1':
-            send_ansi(RESTORE_CURSOR_POSITION)
-            send_ansi(CLEAR_SCREEN_TO_END)
+            restore_cursor_and_clear_screen()
             try:
                 run_game(dict_path, stages)
-            except FileProcessingError as error:
+            except DictionaryFileError as error:
                 print(error)
                 sys.exit(1)
 
