@@ -134,8 +134,11 @@ def get_random_word(dict_path: Path) -> str:
         word = None
 
         for index, line in enumerate(fhand, start=1):
+            line = line.strip()
+            if not line:
+                continue
             if randrange(0, index) == 0:
-                word = line.strip()
+                word = line
 
         if word is None:
             raise DictionaryFileError(f'Файл {dict_path} пуст.\n')
