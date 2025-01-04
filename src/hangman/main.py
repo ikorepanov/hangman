@@ -10,6 +10,7 @@ from hangman.params import (
     CYRILLIC_LETTER_MSG,
     DICT_PATH,
     EMPTY_LINE_MSG,
+    MORE_THAN_ONE_SYMBOL_MSK,
     RESTORE_CURSOR_POSITION,
     SAVE_CURSOR_POSITION,
     STAGES,
@@ -39,6 +40,12 @@ def is_already_used(
     return letter in used_letters
 
 
+def is_more_than_one_symbol(letter: str) -> bool:
+    """Проверяет, не введено ли более одного символа."""
+
+    return len(letter) > 1
+
+
 class ValidationResult(NamedTuple):
     is_valid: bool
     message: str = ''
@@ -52,6 +59,9 @@ def validate_letter(
 
     if is_empty_line(letter):
         return ValidationResult(False, EMPTY_LINE_MSG)
+
+    if is_more_than_one_symbol(letter):
+        return ValidationResult(False, MORE_THAN_ONE_SYMBOL_MSK)
 
     if not is_cyrillic(letter):
         return ValidationResult(False, CYRILLIC_LETTER_MSG)
@@ -96,9 +106,6 @@ def enter_letter(used_letters: list[str]) -> str:
 
     while True:
         letter = input('Введите букву: ').lower()
-
-        if len(letter) > 1:
-            letter = letter[0]
 
         result = validate_letter(letter, used_letters)
 
