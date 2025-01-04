@@ -33,7 +33,7 @@ def is_cyrillic(letter: str) -> bool:
 
 def is_already_used(
     letter: str,
-    used_letters: set[str],
+    used_letters: list[str],
 ) -> bool:
     """Проверяет, была ли буква уже введена пользователем."""
 
@@ -53,7 +53,7 @@ class ValidationResult(NamedTuple):
 
 def validate_letter(
     letter: str,
-    used_letters: set[str],
+    used_letters: list[str],
 ) -> ValidationResult:
     """Проверяет, является ли введённая буква валидной."""
 
@@ -101,7 +101,7 @@ def display_error_and_retry(error_message: str) -> None:
     send_ansi(CLEAR_CURRENT_LINE)
 
 
-def enter_letter(used_letters: set[str]) -> str:
+def enter_letter(used_letters: list[str]) -> str:
     """Запрашивает ввод буквы, проверяет её допустимость и добавляет в список использованных букв."""
 
     while True:
@@ -113,7 +113,7 @@ def enter_letter(used_letters: set[str]) -> str:
             display_error_and_retry(result.message)
             continue
 
-        used_letters.add(letter)
+        used_letters.append(letter)
 
         return letter
 
@@ -155,7 +155,7 @@ def init_start_params(dict_path: Path) -> dict[str, Any]:
         'word': word,
         'mask': ['_'] * len(word),
         'mistakes': 0,
-        'used_letters': set()
+        'used_letters': []
     }
 
 
@@ -173,7 +173,7 @@ def build_hangman(
 def format_current_state(
     mask: list[str],
     mistakes: int,
-    used_letters: set[str],
+    used_letters: list[str],
     stages: list[str]
 ) -> str:
     """Формирует набор данных для отображения текущего состояния."""
@@ -189,7 +189,7 @@ def format_current_state(
 def show_current_state(
     mask: list[str],
     mistakes: int,
-    used_letters: set[str],
+    used_letters: list[str],
     stages: list[str],
 ) -> None:
     """Отображает текущее состояние маски слова, количество ошибок, состояние виселицы и использованные буквы."""
