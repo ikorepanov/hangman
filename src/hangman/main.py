@@ -11,18 +11,16 @@ from hangman.params import (
     DICT_PATH,
     EMPTY_LINE_MSG,
     MORE_THAN_ONE_SYMBOL_MSK,
-    RESTORE_CURSOR_POSITION,
-    SAVE_CURSOR_POSITION,
     STAGES,
     USED_LETTER_MSG,
     WELCOME_MESSAGE,
 )
 
+from hangman.tools import get_cursor_pos, GettingCursorPos
 
-def move_cursor_up(lines: int) -> str:
-    """Возвращает ANSI-код для перемещения курсора вверх на указанное количество строк."""
 
-    return f'\033[{lines}F'
+def move_cursor_to(x: str, y: str) -> str:
+    return f'\033[{y};{x}H'
 
 
 def send_ansi(sequence: str) -> None:
@@ -31,25 +29,25 @@ def send_ansi(sequence: str) -> None:
     print(sequence, end='')
 
 
-def restore_cursor_and_clear_screen() -> None:
+def restore_cursor_and_clear_screen(x: str, y: str) -> None:
     """Отправляет в терминал ANSI-коды для возврата курсора в запомненную позицию и очистки экрана."""
 
-    send_ansi(RESTORE_CURSOR_POSITION)
+    send_ansi(move_cursor_to(x, y))
     send_ansi(CLEAR_SCREEN_TO_END)
 
 
-def display_error_and_retry(error_message: str) -> None:
+def show_warning_and_retry(error_message: str, x: str, y: str) -> None:
     """Перемещает курсор, стирая не нужное и печатая сообщение."""
 
     print()
     send_ansi(CLEAR_CURRENT_LINE)
-    print(error_message)
-    send_ansi(move_cursor_up(3))
+    print(error_message, end='')
+    send_ansi(move_cursor_to(x, y))
     send_ansi(CLEAR_CURRENT_LINE)
 
 
 class ValidationResult(NamedTuple):
-    is_valid: bool
+    is_positive: bool
     message: str = ''
 
 
@@ -77,13 +75,15 @@ def validate_letter(
 def enter_letter(used_letters: list[str]) -> str:
     """Запрашивает ввод буквы, проверяет её допустимость и добавляет в список использованных букв."""
 
+    entering_letter_pos = get_cursor_pos()
+
     while True:
         letter = input('Введите букву: ').lower()
 
-        result = validate_letter(letter, used_letters)
+        result_of_letter_validation = validate_letter(letter, used_letters)
 
-        if not result.is_valid:
-            display_error_and_retry(result.message)
+        if not result_of_letter_validation.is_positive:
+            show_warning_and_retry(result_of_letter_validation.message, entering_letter_pos.x, entering_letter_pos.y)
             continue
 
         used_letters.append(letter)
@@ -183,7 +183,7 @@ def open_mask(
     return mask
 
 
-class LetterProcessingResult(NamedTuple):
+class ProcessingResult(NamedTuple):
     mask: list[str]
     mistakes: int
 
@@ -193,7 +193,7 @@ def process_letter(
     word: str,
     mask: list[str],
     mistakes: int,
-) -> LetterProcessingResult:
+) -> ProcessingResult:
     """Обрабатывает введённую пользователем букву."""
 
     if letter in word:
@@ -201,16 +201,15 @@ def process_letter(
     else:
         mistakes += 1
 
-    return LetterProcessingResult(mask, mistakes)
+    return ProcessingResult(mask, mistakes)
 
 
 def run_game(
     dict_path: Path,
     stages: list[str],
+    start_pos: GettingCursorPos,
 ) -> None:
     """Основной цикл игры "Виселица"."""
-
-    send_ansi(SAVE_CURSOR_POSITION)
 
     start_params = init_start_params(dict_path)
 
@@ -223,11 +222,11 @@ def run_game(
 
     while True:
         letter = enter_letter(used_letters)
-        processing_result = process_letter(letter, word, mask, mistakes)
+        result_of_letter_processing = process_letter(letter, word, mask, mistakes)
 
-        mask = processing_result.mask
-        mistakes = processing_result.mistakes
-        restore_cursor_and_clear_screen()
+        mask = result_of_letter_processing.mask
+        mistakes = result_of_letter_processing.mistakes
+        restore_cursor_and_clear_screen(start_pos.x, start_pos.y)
         render_game_state(mask, mistakes, used_letters, stages)
 
         if ''.join(mask) == word:
@@ -239,36 +238,37 @@ def run_game(
             break
 
 
-def get_user_decision() -> str:
+def get_user_decision(start_pos: GettingCursorPos) -> str:
     """Принимает от пользователя решение о продолжении игры."""
 
     while True:
-        decision = input('Начать новую игру (1) или выйти из приложения (2)?\n\nВведите 1 или 2: ')
+        decision = input('Начать новую игру (1) или выйти из приложения (2)? ')
 
         if decision in {'1', '2'}:
             return decision
 
-        display_error_and_retry(f'Нужно ввести 1 или 2. Вы ввели "{decision}"')
-        send_ansi(move_cursor_up(2))
+        show_warning_and_retry(f'Нужно ввести 1 или 2. Вы ввели "{decision}"', start_pos.x, start_pos.y)
+        send_ansi(move_cursor_to(start_pos.x, start_pos.y))
 
 
 def main() -> None:
     """Основная функция."""
 
     print(WELCOME_MESSAGE)
-    send_ansi(SAVE_CURSOR_POSITION)
+    initial_cursor_position = get_cursor_pos()
 
     while True:
-        decision = get_user_decision()
+        decision = get_user_decision(initial_cursor_position)
 
         if decision == '2':  # Выход
             send_ansi(CLEAR_SCREEN_TO_END)
             print('\nВсего доброго!\n')
             break
 
-        restore_cursor_and_clear_screen()
+        restore_cursor_and_clear_screen(initial_cursor_position.x, initial_cursor_position.y)
+
         try:
-            run_game(DICT_PATH, STAGES)
+            run_game(DICT_PATH, STAGES, initial_cursor_position)
         except DictionaryFileError as error:
             print(error)
             sys.exit(1)
