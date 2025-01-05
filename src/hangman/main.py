@@ -2,7 +2,10 @@ import re
 import sys
 from pathlib import Path
 from random import randrange
-from typing import Any, NamedTuple
+from typing import (
+    Any,
+    NamedTuple,
+)
 
 from hangman.params import (
     CLEAR_CURRENT_LINE,
@@ -10,13 +13,16 @@ from hangman.params import (
     CYRILLIC_LETTER_MSG,
     DICT_PATH,
     EMPTY_LINE_MSG,
-    MORE_THAN_ONE_SYMBOL_MSK,
+    MORE_THAN_ONE_SYMBOL_MSG,
     STAGES,
     USED_LETTER_MSG,
     WELCOME_MESSAGE,
 )
-
-from hangman.tools import get_cursor_pos, GettingCursorPos
+from hangman.tools import (
+    get_cursor_pos,
+    GettingCursorPos,
+    TerminalError,
+)
 
 
 def move_cursor_to(x: str, y: str) -> str:
@@ -61,7 +67,7 @@ def validate_letter(
         return ValidationResult(False, EMPTY_LINE_MSG)
 
     if len(letter) > 1:
-        return ValidationResult(False, MORE_THAN_ONE_SYMBOL_MSK)
+        return ValidationResult(False, MORE_THAN_ONE_SYMBOL_MSG)
 
     if not re.fullmatch('[ёа-я]', letter):
         return ValidationResult(False, CYRILLIC_LETTER_MSG)
@@ -270,6 +276,9 @@ def main() -> None:
         try:
             run_game(DICT_PATH, STAGES, initial_cursor_position)
         except DictionaryFileError as error:
+            print(error)
+            sys.exit(1)
+        except TerminalError as error:
             print(error)
             sys.exit(1)
 

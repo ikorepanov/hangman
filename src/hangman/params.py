@@ -78,12 +78,10 @@ L_LEG = r"""
 
 STAGES = [EMPTY, HEAD, BODY, R_HAND, L_HAND, R_LEG, L_LEG]
 
-SAVE_CURSOR_POSITION = '\033[s'
-RESTORE_CURSOR_POSITION = '\033[u'
 CLEAR_SCREEN_TO_END = '\033[J'
 CLEAR_CURRENT_LINE = '\033[K'
 
 CYRILLIC_LETTER_MSG = 'Необходимо использовать буквы русского алфавита: а - я (А - Я)'
 USED_LETTER_MSG = 'Вы уже вводили букву "{}" (см. Использованные буквы)'
 EMPTY_LINE_MSG = 'Вы отправляете пустую строку. Введите букву'
-MORE_THAN_ONE_SYMBOL_MSK = 'Вы ввели более одного символа. Введите один'
+MORE_THAN_ONE_SYMBOL_MSG = 'Вы ввели более одного символа. Введите один'
