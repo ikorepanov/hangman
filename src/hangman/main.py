@@ -116,7 +116,7 @@ def get_random_word(dict_path: Path) -> str:
             line = line.strip()
             if not line:
                 continue
-            if randrange(0, index) == 0:
+            if randrange(0, index) == 0:  # Выбираем слово с вероятностью 1/index
                 word = line
 
         if word is None:
@@ -127,7 +127,6 @@ def get_random_word(dict_path: Path) -> str:
 
 def init_start_params(dict_path: Path) -> dict[str, Any]:
     """Инициализирует стартовые параметры игры и возвращает их в виде словаря."""
-
     word = get_random_word(dict_path)
 
     return {

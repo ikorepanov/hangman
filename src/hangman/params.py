@@ -1,13 +1,28 @@
 from pathlib import Path
 
-if '__file__' not in globals():
-    raise RuntimeError('Переменная __file__ не определена')
 
-path = Path(__file__)
-if len(path.parents) < 3:
-    raise ValueError('Недостаточно уровней в пути для доступа к parents[2]')
+class PathError(Exception):
+    pass
 
-CWD = path.parents[2]
+
+try:
+    path = Path(__file__)
+except NameError:
+    raise PathError(
+        'Переменная "__file__" недоступна. Программа не может продолжить работу.'
+    )
+
+INDEX = 2
+
+if INDEX < len(path.parents):
+    CWD = path.parents[INDEX]
+else:
+    raise PathError(
+        f'Абсолютный путь к params.py содержит менее ({INDEX} + 1) уровней вложенности. '
+        'Убедитесь, что модуль находится в директории с достаточной глубиной, '
+        'или измените код для работы с текущей структурой файлов.'
+    )
+
 DICT_PATH = CWD / 'data/dictionary.txt'
 
 WELCOME_MESSAGE = """
