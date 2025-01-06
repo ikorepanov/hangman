@@ -1,7 +1,9 @@
+import os
 import re
 import sys
 from pathlib import Path
 from random import randrange
+from shutil import get_terminal_size
 from typing import (
     Any,
     NamedTuple,
@@ -256,8 +258,34 @@ def get_user_decision(start_pos: GettingCursorPos) -> str:
         send_ansi(move_cursor_to(start_pos.x, start_pos.y))
 
 
+def check_terminal_size() -> None:
+    columns, rows = get_terminal_size()
+    if rows < 30:
+        raise TerminalError(
+            '\nДля того, чтобы сыграть - увеличьте высоту терминала.\n'
+            f'Текущая высота: {rows} строк; необходимо минимум 30 строк. \n'
+        )
+
+
+def clear_screen() -> None:
+    # Для Linux или macOS
+    if os.name == 'posix':
+        os.system('clear')
+    # Для Windows
+    elif os.name == 'nt':
+        os.system('cls')
+
+
 def main() -> None:
     """Основная функция."""
+
+    try:
+        check_terminal_size()
+    except TerminalError as error:
+        print(error)
+        sys.exit(1)
+
+    clear_screen()
 
     print(WELCOME_MESSAGE)
     initial_cursor_position = get_cursor_pos()
