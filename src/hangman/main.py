@@ -258,10 +258,15 @@ def get_user_decision(start_pos: GettingCursorPos) -> str:
         send_ansi(move_cursor_to(start_pos.x, start_pos.y))
 
 
+class TerminalSizeError(Exception):
+
+    pass
+
+
 def check_terminal_size() -> None:
     columns, rows = get_terminal_size()
     if rows < 30:
-        raise TerminalError(
+        raise TerminalSizeError(
             '\nДля того, чтобы сыграть - увеличьте высоту терминала.\n'
             f'Текущая высота: {rows} строк; необходимо минимум 30 строк. \n'
         )
@@ -276,19 +281,28 @@ def clear_screen() -> None:
         os.system('cls')
 
 
-def main() -> None:
-    """Основная функция."""
-
+def prepare_screen() -> None:
     try:
         check_terminal_size()
-    except TerminalError as error:
+    except TerminalSizeError as error:
         print(error)
         sys.exit(1)
 
     clear_screen()
 
     print(WELCOME_MESSAGE)
-    initial_cursor_position = get_cursor_pos()
+
+
+def main() -> None:
+    """Основная функция."""
+
+    prepare_screen()
+
+    try:
+        initial_cursor_position = get_cursor_pos()
+    except TerminalError as error:
+        print(error)
+        sys.exit(1)
 
     while True:
         decision = get_user_decision(initial_cursor_position)
@@ -303,9 +317,6 @@ def main() -> None:
         try:
             run_game(DICT_PATH, STAGES, initial_cursor_position)
         except DictionaryFileError as error:
-            print(error)
-            sys.exit(1)
-        except TerminalError as error:
             print(error)
             sys.exit(1)
 
