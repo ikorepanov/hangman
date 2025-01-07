@@ -19,24 +19,44 @@ https://zhukovsd.github.io/python-backend-learning-course/
 
 ## Установка
 
-Клонируем репозиторий:
+Клонируйте репозиторий:
 ```shell
-git clone https://github.com/ikorepanov/hangman.git
+git clone -b refactor/hangman-reviews https://github.com/ikorepanov/hangman.git
 ```
 
-Переходим в папку hangman:
+Перейдите в папку hangman:
 ```shell
 cd hangman
 ```
 
-Устанавливаем пакет в editable-режиме с помощью команды:
+Разверните виртуальное окружение:
 ```shell
-pip install -e .
+python -m venv venv
+```
+
+Активируйте виртуальное окружение:
+* Linux и macOS
+  ```shell
+  source venv/bin/activate
+  ```
+* Windows
+  ```shell
+  source venv/Scripts/activate
+  ```
+
+Обновите `pip`:
+```shell
+python -m pip install --upgrade pip
+```
+
+Установите проект:
+```shell
+pip install .
 ```
 
 ## Использование
 
-Запускаем скрипт:
+Запустите скрипт:
 ```shell
 python src/hangman/main.py
 ```
@@ -44,7 +64,7 @@ python src/hangman/main.py
 или
 
 ```shell
-python -m src.hangman.main
+python -m hangman.main
 ```
 
-В дальнейшем - следуем указаниям на экране.
+В дальнейшем - следуйте указаниям на экране.
