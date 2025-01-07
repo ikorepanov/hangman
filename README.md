@@ -31,7 +31,7 @@ cd hangman
 
 Разверните виртуальное окружение:
 ```shell
-python -m venv venv
+python -m venv .venv
 ```
 
 Активируйте виртуальное окружение:
