@@ -1,34 +1,10 @@
 from pathlib import Path
 
-
-class PathError(Exception):
-    """Исключение, возникающее при ошибках, связанных с обработкой пути файловой системы."""
-
-    pass
-
-
-# Определение пути к текущему файлу
-try:
-    path = Path(__file__).resolve()
-except NameError:
-    raise PathError(
-        'Переменная "__file__" недоступна. Программа не может продолжить работу.'
-    )
-
-INDEX = 2  # Индекс уровня вложенности для поиска родительской директории
-
-# Проверка достаточной глубины пути
-if INDEX < len(path.parents):
-    PROJECT_ROOT = path.parents[INDEX]
-else:
-    raise PathError(
-        f'Абсолютный путь к params.py содержит менее ({INDEX} + 1) уровней вложенности. '
-        'Убедитесь, что модуль находится в директории с достаточной глубиной, '
-        'или измените код для работы с текущей структурой файлов.'
-    )
+# Определение пути к CWD
+CWD = Path().resolve()
 
 # Определение пути к файлу словаря
-DICT_PATH = PROJECT_ROOT / 'data/dictionary.txt'
+DICT_PATH = CWD / 'data/dictionary.txt'
 
 # Приветственное сообщение
 WELCOME_MESSAGE = """

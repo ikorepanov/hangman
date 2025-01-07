@@ -56,13 +56,7 @@ pip install .
 
 ## Использование
 
-Запустите скрипт:
-```shell
-python src/hangman/main.py
-```
-
-или
-
+Запустите приложение:
 ```shell
 python -m hangman.main
 ```

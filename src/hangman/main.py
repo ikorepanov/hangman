@@ -285,10 +285,9 @@ def check_terminal_size() -> None:
 def clear_screen() -> None:
     """Очищает экран терминала."""
 
-    # Для Linux или macOS
     if os.name == 'posix':
         os.system('clear')
-    # Для Windows
+
     elif os.name == 'nt':
         os.system('cls')
 
