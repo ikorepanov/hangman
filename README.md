@@ -37,11 +37,11 @@ python -m venv .venv
 Активируйте виртуальное окружение:
 * Linux и macOS
   ```shell
-  source venv/bin/activate
+  source .venv/bin/activate
   ```
 * Windows
   ```shell
-  source venv/Scripts/activate
+  source .venv/Scripts/activate
   ```
 
 Обновите `pip`:
