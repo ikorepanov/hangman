@@ -9,7 +9,7 @@ class PathError(Exception):
 
 # Определение пути к текущему файлу
 try:
-    path = Path(__file__)
+    path = Path(__file__).resolve()
 except NameError:
     raise PathError(
         'Переменная "__file__" недоступна. Программа не может продолжить работу.'
@@ -19,7 +19,7 @@ INDEX = 2  # Индекс уровня вложенности для поиск�
 
 # Проверка достаточной глубины пути
 if INDEX < len(path.parents):
-    CWD = path.parents[INDEX]
+    PROJECT_ROOT = path.parents[INDEX]
 else:
     raise PathError(
         f'Абсолютный путь к params.py содержит менее ({INDEX} + 1) уровней вложенности. '
@@ -28,7 +28,7 @@ else:
     )
 
 # Определение пути к файлу словаря
-DICT_PATH = CWD / 'data/dictionary.txt'
+DICT_PATH = PROJECT_ROOT / 'data/dictionary.txt'
 
 # Приветственное сообщение
 WELCOME_MESSAGE = """
