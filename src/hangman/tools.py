@@ -7,7 +7,7 @@ from typing import NamedTuple
 
 if (sys.platform == "win32"):
     import ctypes
-    from ctypes import wintypes
+    from ctypes import wintypes  # noqa: F401
 else:
     import termios
 
@@ -20,7 +20,7 @@ class GettingCursorPos(NamedTuple):
 
 
 class TerminalError(Exception):
-    """Кастомное исключение для ошибок, связанных с работой терминала."""
+    """Исключение, связанное с ошибками работы терминала."""
 
     pass
 

@@ -28,6 +28,8 @@ from hangman.tools import (
 
 
 def move_cursor_to(x: str, y: str) -> str:
+    """Возвращает ANSI-последовательность для перемещения курсора в заданную позицию."""
+
     return f'\033[{y};{x}H'
 
 
@@ -38,14 +40,14 @@ def send_ansi(sequence: str) -> None:
 
 
 def restore_cursor_and_clear_screen(x: str, y: str) -> None:
-    """Отправляет в терминал ANSI-коды для возврата курсора в запомненную позицию и очистки экрана."""
+    """Возвращает курсор в заданную позицию и очищает экран от текущей позиции до конца."""
 
     send_ansi(move_cursor_to(x, y))
     send_ansi(CLEAR_SCREEN_TO_END)
 
 
 def show_warning_and_retry(error_message: str, x: str, y: str) -> None:
-    """Перемещает курсор, стирая не нужное и печатая сообщение."""
+    """Отображает сообщение об ошибке, возвращает курсор на заданную позицию и очищает текущую строку."""
 
     print()
     send_ansi(CLEAR_CURRENT_LINE)
@@ -55,6 +57,8 @@ def show_warning_and_retry(error_message: str, x: str, y: str) -> None:
 
 
 class ValidationResult(NamedTuple):
+    """Результат валидации введённой буквы."""
+
     is_positive: bool
     message: str = ''
 
@@ -63,7 +67,7 @@ def validate_letter(
     letter: str,
     used_letters: list[str],
 ) -> ValidationResult:
-    """Проверяет, является ли введённая буква валидной."""
+    """Проверяет введённую букву на валидность."""
 
     if not letter:
         return ValidationResult(False, EMPTY_LINE_MSG)
@@ -81,7 +85,7 @@ def validate_letter(
 
 
 def enter_letter(used_letters: list[str]) -> str:
-    """Запрашивает ввод буквы, проверяет её допустимость и добавляет в список использованных букв."""
+    """Запрашивает ввод буквы, проверяет её валидность и добавляет в список использованных букв."""
 
     entering_letter_pos = get_cursor_pos()
 
@@ -100,7 +104,7 @@ def enter_letter(used_letters: list[str]) -> str:
 
 
 class DictionaryFileError(Exception):
-    """Кастомное исключение для ошибок, связанных с обработкой файла."""
+    """ Исключение, возникающее при ошибках обработки файла словаря."""
 
     pass
 
@@ -128,7 +132,8 @@ def get_random_word(dict_path: Path) -> str:
 
 
 def init_start_params(dict_path: Path) -> dict[str, Any]:
-    """Инициализирует стартовые параметры игры и возвращает их в виде словаря."""
+    """Инициализирует стартовые параметры игры."""
+
     word = get_random_word(dict_path)
 
     return {
@@ -143,7 +148,7 @@ def build_hangman(
     mistakes: int,
     stages: list[str],
 ) -> str:
-    """Возвращает текущую сцену виселицы в зависимости от числа ошибок."""
+    """Возвращает текущую сцену виселицы в зависимости от количества ошибок."""
 
     if 0 <= mistakes <= len(stages) - 1:
         return stages[mistakes]
@@ -156,7 +161,7 @@ def format_current_state(
     used_letters: list[str],
     stages: list[str]
 ) -> str:
-    """Формирует набор данных для отображения текущего состояния."""
+    """Формирует текст для отображения текущего состояния."""
 
     return (
         f'{" ".join(mask)}\n'
@@ -172,7 +177,7 @@ def render_game_state(
     used_letters: list[str],
     stages: list[str],
 ) -> None:
-    """Отображает текущее состояние маски слова, количество ошибок, состояние виселицы и использованные буквы."""
+    """Отображает текущее состояние игры в терминале."""
 
     print(format_current_state(mask, mistakes, used_letters, stages))
 
@@ -182,7 +187,7 @@ def open_mask(
     word: str,
     letter: str,
 ) -> list[str]:
-    """Открывает в маске все вхождения угаданной буквы."""
+    """Открывает все вхождения угаданной буквы в маске слова."""
 
     for index, char in enumerate(word):
         if char == letter:
@@ -191,6 +196,8 @@ def open_mask(
 
 
 class ProcessingResult(NamedTuple):
+    """Результат обработки введённой буквы."""
+
     mask: list[str]
     mistakes: int
 
@@ -201,7 +208,7 @@ def process_letter(
     mask: list[str],
     mistakes: int,
 ) -> ProcessingResult:
-    """Обрабатывает введённую пользователем букву."""
+    """Обрабатывает введённую букву: обновляет маску слова или увеличивает количество ошибок."""
 
     if letter in word:
         mask = open_mask(mask, word, letter)
@@ -246,7 +253,7 @@ def run_game(
 
 
 def get_user_decision(start_pos: GettingCursorPos) -> str:
-    """Принимает от пользователя решение о продолжении игры."""
+    """Запрашивает решение пользователя о продолжении игры или выходе."""
 
     while True:
         decision = input('Начать новую игру (1) или выйти из приложения (2)? ')
@@ -259,11 +266,14 @@ def get_user_decision(start_pos: GettingCursorPos) -> str:
 
 
 class TerminalSizeError(Exception):
+    """Исключение, возникающее при неподходящем размере терминала."""
 
     pass
 
 
 def check_terminal_size() -> None:
+    """Проверяет размер терминала перед запуском игры."""
+
     columns, rows = get_terminal_size()
     if rows < 30:
         raise TerminalSizeError(
@@ -273,6 +283,8 @@ def check_terminal_size() -> None:
 
 
 def clear_screen() -> None:
+    """Очищает экран терминала."""
+
     # Для Linux или macOS
     if os.name == 'posix':
         os.system('clear')
@@ -282,6 +294,8 @@ def clear_screen() -> None:
 
 
 def prepare_screen() -> None:
+    """Подготавливает экран терминала для запуска игры."""
+
     try:
         check_terminal_size()
     except TerminalSizeError as error:
@@ -294,7 +308,7 @@ def prepare_screen() -> None:
 
 
 def main() -> None:
-    """Основная функция."""
+    """Основная функция программы."""
 
     prepare_screen()
 
