@@ -10,11 +10,12 @@ from typing import (
 )
 
 from hangman.params import (
-    CLEAR_CURRENT_LINE,
     CLEAR_SCREEN_TO_END,
     CYRILLIC_LETTER_MSG,
     DICT_PATH,
     EMPTY_LINE_MSG,
+    MIN_TERMINAL_HEIGHT,
+    MIN_TERMINAL_WIDTH,
     MORE_THAN_ONE_SYMBOL_MSG,
     STAGES,
     USED_LETTER_MSG,
@@ -46,14 +47,15 @@ def restore_cursor_and_clear_screen(x: str, y: str) -> None:
     send_ansi(CLEAR_SCREEN_TO_END)
 
 
-def show_warning_and_retry(error_message: str, x: str, y: str) -> None:
-    """Отображает сообщение об ошибке, возвращает курсор на заданную позицию и очищает текущую строку."""
+def show_warning_and_reset_screen(error_message: str, x: str, y: str) -> None:
+    """Очищает экран, отображает сообщение об ошибке и возвращает курсор в заданную позицию."""
 
+    send_ansi(move_cursor_to(x, y))
+    send_ansi(CLEAR_SCREEN_TO_END)
     print()
-    send_ansi(CLEAR_CURRENT_LINE)
+    print()
     print(error_message, end='')
     send_ansi(move_cursor_to(x, y))
-    send_ansi(CLEAR_CURRENT_LINE)
 
 
 class ValidationResult(NamedTuple):
@@ -95,7 +97,11 @@ def enter_letter(used_letters: list[str]) -> str:
         result_of_letter_validation = validate_letter(letter, used_letters)
 
         if not result_of_letter_validation.is_positive:
-            show_warning_and_retry(result_of_letter_validation.message, entering_letter_pos.x, entering_letter_pos.y)
+            show_warning_and_reset_screen(
+                result_of_letter_validation.message,
+                entering_letter_pos.x,
+                entering_letter_pos.y
+            )
             continue
 
         used_letters.append(letter)
@@ -262,8 +268,7 @@ def get_user_decision() -> str:
         if decision in {'1', '2'}:
             return decision
 
-        show_warning_and_retry(f'Нужно ввести 1 или 2. Вы ввели "{decision}"', cursor_pos.x, cursor_pos.y)
-        send_ansi(move_cursor_to(cursor_pos.x, cursor_pos.y))
+        show_warning_and_reset_screen(f'Нужно ввести 1 или 2. Вы ввели "{decision}"', cursor_pos.x, cursor_pos.y)
 
 
 class TerminalSizeError(Exception):
@@ -276,10 +281,16 @@ def check_terminal_size() -> None:
     """Проверяет размер терминала перед запуском игры."""
 
     columns, rows = get_terminal_size()
-    if rows < 30:
+    if rows < MIN_TERMINAL_HEIGHT:
         raise TerminalSizeError(
             '\nДля того, чтобы сыграть - увеличьте высоту терминала.\n'
-            f'Текущая высота: {rows} строк; необходимо минимум 30 строк. \n'
+            f'Текущая высота: {rows} строк; необходимо минимум {MIN_TERMINAL_HEIGHT} строк. \n'
+        )
+
+    if columns < MIN_TERMINAL_WIDTH:
+        raise TerminalSizeError(
+            '\nДля того, чтобы сыграть - увеличьте ширину терминала.\n'
+            f'Текущая ширина: {columns} столбцов; необходимо минимум {MIN_TERMINAL_WIDTH} столбцов. \n'
         )
 
 
