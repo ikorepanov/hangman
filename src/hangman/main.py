@@ -252,17 +252,18 @@ def run_game(
             break
 
 
-def get_user_decision(start_pos: GettingCursorPos) -> str:
+def get_user_decision() -> str:
     """Запрашивает решение пользователя о продолжении игры или выходе."""
 
     while True:
+        cursor_pos = get_cursor_pos()
         decision = input('Начать новую игру (1) или выйти из приложения (2)? ')
 
         if decision in {'1', '2'}:
             return decision
 
-        show_warning_and_retry(f'Нужно ввести 1 или 2. Вы ввели "{decision}"', start_pos.x, start_pos.y)
-        send_ansi(move_cursor_to(start_pos.x, start_pos.y))
+        show_warning_and_retry(f'Нужно ввести 1 или 2. Вы ввели "{decision}"', cursor_pos.x, cursor_pos.y)
+        send_ansi(move_cursor_to(cursor_pos.x, cursor_pos.y))
 
 
 class TerminalSizeError(Exception):
@@ -318,7 +319,7 @@ def main() -> None:
         sys.exit(1)
 
     while True:
-        decision = get_user_decision(initial_cursor_position)
+        decision = get_user_decision()
 
         if decision == '2':  # Выход
             send_ansi(CLEAR_SCREEN_TO_END)
