@@ -53,7 +53,7 @@ python -m venv .venv
   ```
 * Windows
   ```shell
-  source .venv/Scripts/activate
+  .venv/Scripts/activate
   ```
 
 Обновите `pip`:
