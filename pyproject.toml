@@ -1,7 +1,7 @@
 [project]
 name = "hangman"
 version = "0.1.0"
-description = "The first project from Sergey Zhukov's roadmap"
+description = "Console-based Hangman game written in Python with input validation, ASCII graphics, and terminal control using ANSI escape sequences."
 authors = [
     {name = "Ilia Korepanov"},
 ]
