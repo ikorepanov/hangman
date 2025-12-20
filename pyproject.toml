@@ -5,24 +5,11 @@ description = "The first project from Sergey Zhukov's roadmap"
 authors = [
     {name = "Ilia Korepanov"},
 ]
-dependencies = [
-    "isort==5.13.2",
-    "flake8==7.1.1",
-    "mypy==1.11.2",
-    "black==24.10.0",
-]
-requires-python = ">=3.9.13, <3.12"
+dependencies = []
+requires-python = ">=3.9.10, <3.12"
 readme = "README.md"
 license = {text = "MIT"}
 
-
-[tool.pdm]
-distribution = false
-
-[tool.pdm.dev-dependencies]
-lint = [
-    "wemake-python-styleguide==0.18.0",
-]
 [tool.isort]
 line_length = 120
 force_alphabetical_sort_within_sections = true
@@ -42,3 +29,12 @@ ignore_missing_imports = true
 
 # for strict mypy:
 disallow_untyped_defs = true
+
+[tool.dev-dependencies]
+lint = [
+    "isort==5.13.2",
+    "flake8==7.1.1",
+    "mypy==1.11.2",
+    "black==24.10.0",
+    "wemake-python-styleguide==0.18.0",
+]
